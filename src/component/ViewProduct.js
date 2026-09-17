@@ -1,36 +1,33 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ViewProduct = () => {
+
   const navigate = useNavigate();
 
   // ==============================
   // API URL
   // ==============================
-  const apiUrl = 'http://localhost:8080/api/products/';
+  const apiUrl = 'http://localhost:8080/api/products';
 
   // ==============================
   // STATES
   // ==============================
   const [products, setProducts] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState('');
-
   const [showForm, setShowForm] = useState(false);
-
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     productId: '',
     productName: '',
-    description: '',
-    quantity: '',
+    productQuantity: '',
+    receiptDate: '',
+    issueDate: '',
     price: '',
-    category: '',
-    supplier: ''
+    supplierName: '',
+    productDescription: ''
   });
 
   // ==============================
@@ -48,23 +45,25 @@ const ViewProduct = () => {
       setLoading(true);
       setError('');
 
-      const response = await fetch(`${apiUrl}/getAll`);
+      const response = await fetch(`${apiUrl}/all`);
+      const responseText = await response.text();
 
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        throw new Error(responseText || 'Failed to fetch products');
       }
 
-      const data = await response.json();
+      const data = responseText ? JSON.parse(responseText) : [];
+
+      console.log('Products received from backend:', data);
 
       setProducts(Array.isArray(data) ? data : []);
 
     } catch (err) {
       console.error('Error fetching products:', err);
-
       setError(
+        err.message ||
         'Unable to load products. Make sure the backend is running.'
       );
-
     } finally {
       setLoading(false);
     }
@@ -93,27 +92,24 @@ const ViewProduct = () => {
   // OPEN UPDATE FORM
   // ==============================
   const handleUpdateClick = (product) => {
-
     setFormData({
-      productId: product.productId || '',
-      productName: product.productName || '',
-      description: product.description || '',
-      quantity: product.quantity || '',
-      price: product.price || '',
-      category: product.category || '',
-      supplier: product.supplier || ''
+      productId: product.productId ?? '',
+      productName: product.productName ?? '',
+      productQuantity: product.productQuantity ?? '',
+      receiptDate: product.receiptDate ?? '',
+      issueDate: product.issueDate ?? '',
+      price: product.price ?? '',
+      supplierName: product.supplierName ?? '',
+      productDescription: product.productDescription ?? ''
     });
 
     setShowForm(true);
     setError('');
 
-    // Scroll to form
     setTimeout(() => {
       document
         .getElementById('product-update-form')
-        ?.scrollIntoView({
-          behavior: 'smooth'
-        });
+        ?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
@@ -133,41 +129,60 @@ const ViewProduct = () => {
       return;
     }
 
+    if (!formData.productDescription.trim()) {
+      alert('Please enter product description.');
+      return;
+    }
+
+    if (!formData.productQuantity.trim()) {
+      alert('Please enter product quantity.');
+      return;
+    }
+
+    if (formData.price === '' || formData.price === null) {
+      alert('Please enter product price.');
+      return;
+    }
+
+    if (!formData.receiptDate) {
+      alert('Please enter receipt date.');
+      return;
+    }
+
+    if (!formData.issueDate) {
+      alert('Please enter issue date.');
+      return;
+    }
+
+    if (!formData.supplierName.trim()) {
+      alert('Please enter supplier name.');
+      return;
+    }
+
     try {
       setSaving(true);
-
       setError('');
 
+      // IMPORTANT: These names MUST match Product.java
       const productPayload = {
-        productId: formData.productId,
-
         productName: formData.productName.trim(),
-
-        description: formData.description.trim(),
-
-        quantity: parseInt(formData.quantity, 10) || 0,
-
-        price: parseFloat(formData.price) || 0,
-
-        category: formData.category.trim(),
-
-        supplier: formData.supplier.trim()
+        productQuantity: formData.productQuantity.trim(),
+        productDescription: formData.productDescription.trim(),
+        receiptDate: formData.receiptDate,
+        issueDate: formData.issueDate,
+        price: parseInt(formData.price, 10),
+        supplierName: formData.supplierName.trim()
       };
 
-      console.log(
-        'Updating product:',
-        productPayload
-      );
+      console.log('Updating product:', productPayload);
 
       const response = await fetch(
         `${apiUrl}/update/${formData.productId}`,
         {
           method: 'PUT',
-
           headers: {
             'Content-Type': 'application/json'
           },
-
           body: JSON.stringify(productPayload)
         }
       );
@@ -175,42 +190,21 @@ const ViewProduct = () => {
       const responseText = await response.text();
 
       if (!response.ok) {
-        throw new Error(
-          responseText ||
-          'Failed to update product'
-        );
+        throw new Error(responseText || 'Failed to update product');
       }
+
+      console.log('Update response:', responseText);
 
       alert('Product updated successfully!');
 
-      // Close form
       setShowForm(false);
-
-      // Clear form
       clearForm();
-
-      // Refresh table
       await fetchProducts();
 
     } catch (err) {
-
-      console.error(
-        'Error updating product:',
-        err
-      );
-
-      setError(
-        err.message ||
-        'Error updating product.'
-      );
-
-      alert(
-        `Error updating product: ${
-          err.message ||
-          'Unknown error'
-        }`
-      );
-
+      console.error('Error updating product:', err);
+      setError(err.message || 'Error updating product.');
+      alert(`Error updating product: ${err.message || 'Unknown error'}`);
     } finally {
       setSaving(false);
     }
@@ -220,59 +214,33 @@ const ViewProduct = () => {
   // DELETE PRODUCT
   // ==============================
   const handleDeleteProduct = async (productId) => {
-
     const confirmDelete = window.confirm(
       'Are you sure you want to delete this product?'
     );
 
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
-
       setError('');
 
       const response = await fetch(
         `${apiUrl}/delete/${productId}`,
-        {
-          method: 'DELETE'
-        }
+        { method: 'DELETE' }
       );
 
-      const responseText =
-        await response.text();
+      const responseText = await response.text();
 
       if (!response.ok) {
-        throw new Error(
-          responseText ||
-          'Failed to delete product'
-        );
+        throw new Error(responseText || 'Failed to delete product');
       }
 
       alert('Product deleted successfully!');
-
-      // Refresh product table
       await fetchProducts();
 
     } catch (err) {
-
-      console.error(
-        'Error deleting product:',
-        err
-      );
-
-      setError(
-        err.message ||
-        'Error deleting product.'
-      );
-
-      alert(
-        `Error deleting product: ${
-          err.message ||
-          'Unknown error'
-        }`
-      );
+      console.error('Error deleting product:', err);
+      setError(err.message || 'Error deleting product.');
+      alert(`Error deleting product: ${err.message || 'Unknown error'}`);
     }
   };
 
@@ -280,53 +248,38 @@ const ViewProduct = () => {
   // CLEAR FORM
   // ==============================
   const clearForm = () => {
-
     setFormData({
       productId: '',
       productName: '',
-      description: '',
-      quantity: '',
+      productQuantity: '',
+      receiptDate: '',
+      issueDate: '',
       price: '',
-      category: '',
-      supplier: ''
+      supplierName: '',
+      productDescription: ''   // ✅ FIXED: was bare identifier
     });
-
   };
 
   // ==============================
   // CANCEL UPDATE
   // ==============================
   const handleCancel = () => {
-
     setShowForm(false);
-
     clearForm();
-
     setError('');
   };
 
   return (
     <div style={styles.page}>
 
-      {/* ==========================================
-          HEADER
-      ========================================== */}
-
+      {/* HEADER */}
       <div style={styles.header}>
-
         <div>
-
-          <h2 style={styles.title}>
-            Product Management
-          </h2>
-
+          <h2 style={styles.title}>Product Management</h2>
           <p style={styles.subtitle}>
             Manage products, stock and product information
           </p>
-
         </div>
-
-        {/* ADD PRODUCT BUTTON */}
 
         <button
           type="button"
@@ -335,250 +288,117 @@ const ViewProduct = () => {
         >
           + Add Product
         </button>
-
       </div>
 
+      {/* ERROR */}
+      {error && <div style={styles.error}>{error}</div>}
 
-      {/* ==========================================
-          ERROR MESSAGE
-      ========================================== */}
-
-      {error && (
-
-        <div style={styles.error}>
-          {error}
-        </div>
-
-      )}
-
-
-      {/* ==========================================
-          LOADING
-      ========================================== */}
-
+      {/* LOADING */}
       {loading ? (
-
-        <div style={styles.loading}>
-          Loading products...
-        </div>
-
+        <div style={styles.loading}>Loading products...</div>
       ) : (
-
-        /* ==========================================
-           PRODUCT TABLE
-        ========================================== */
-
         <div style={styles.tableContainer}>
-
           <table style={styles.table}>
-
             <thead>
-
               <tr>
-
-                <th style={styles.th}>
-                  ID
-                </th>
-
-                <th style={styles.th}>
-                  Product Name
-                </th>
-
-                <th style={styles.th}>
-                  Description
-                </th>
-
-                <th style={styles.th}>
-                  Quantity
-                </th>
-
-                <th style={styles.th}>
-                  Price
-                </th>
-
-                <th style={styles.th}>
-                  Category
-                </th>
-
-                <th style={styles.th}>
-                  Supplier
-                </th>
-
-                <th style={styles.th}>
-                  Actions
-                </th>
-
+                <th style={styles.th}>ID</th>
+                <th style={styles.th}>Product Name</th>
+                <th style={styles.th}>Quantity</th>
+                <th style={styles.th}>Product Description</th>
+                <th style={styles.th}>Price</th>
+                <th style={styles.th}>Receipt Date</th>
+                <th style={styles.th}>Issue Date</th>
+                <th style={styles.th}>Supplier</th>
+                <th style={styles.th}>Actions</th>
               </tr>
-
             </thead>
 
-
             <tbody>
-
               {products.length === 0 ? (
-
                 <tr>
-
-                  <td
-                    colSpan="8"
-                    style={styles.noProducts}
-                  >
+                  <td colSpan="9" style={styles.noProducts}>
                     No products found.
                   </td>
-
                 </tr>
-
               ) : (
-
                 products.map((product) => (
+                  <tr key={product.productId} style={styles.row}>
 
-                  <tr
-                    key={product.productId}
-                    style={styles.row}
-                  >
-
-                    {/* ID */}
+                    <td style={styles.td}>{product.productId}</td>
 
                     <td style={styles.td}>
-                      {product.productId}
+                      <strong>{product.productName || '-'}</strong>
                     </td>
 
-
-                    {/* NAME */}
-
                     <td style={styles.td}>
-                      <strong>
-                        {product.productName}
-                      </strong>
-                    </td>
-
-
-                    {/* DESCRIPTION */}
-
-                    <td style={styles.td}>
-                      {product.description || '-'}
-                    </td>
-
-
-                    {/* QUANTITY */}
-
-                    <td style={styles.td}>
-
                       <span
                         style={
-                          product.quantity > 0
+                          Number(product.productQuantity) > 0
                             ? styles.stockAvailable
                             : styles.stockEmpty
                         }
                       >
-                        {product.quantity}
+                        {product.productQuantity ?? '0'}
                       </span>
-
                     </td>
 
-
-                    {/* PRICE */}
+                    {/* ✅ FIXED: Description cell now in correct column position */}
+                    <td style={styles.td}>
+                      {product.productDescription || '-'}
+                    </td>
 
                     <td style={styles.td}>
                       {product.price != null
-                        ? Number(
-                            product.price
-                          ).toLocaleString()
+                        ? Number(product.price).toLocaleString()
                         : '0'}
                     </td>
 
+                    <td style={styles.td}>{product.receiptDate || '-'}</td>
 
-                    {/* CATEGORY */}
+                    <td style={styles.td}>{product.issueDate || '-'}</td>
 
-                    <td style={styles.td}>
-                      {product.category || '-'}
-                    </td>
-
-
-                    {/* SUPPLIER */}
+                    <td style={styles.td}>{product.supplierName || '-'}</td>
 
                     <td style={styles.td}>
-                      {product.supplier || '-'}
-                    </td>
-
-
-                    {/* ACTIONS */}
-
-                    <td style={styles.td}>
-
                       <div style={styles.actions}>
-
-                        {/* UPDATE */}
-
                         <button
                           type="button"
-                          onClick={() =>
-                            handleUpdateClick(
-                              product
-                            )
-                          }
+                          onClick={() => handleUpdateClick(product)}
                           style={styles.updateButton}
                         >
                           Update
                         </button>
 
-
-                        {/* DELETE */}
-
                         <button
                           type="button"
                           onClick={() =>
-                            handleDeleteProduct(
-                              product.productId
-                            )
+                            handleDeleteProduct(product.productId)
                           }
                           style={styles.deleteButton}
                         >
                           Delete
                         </button>
-
                       </div>
-
                     </td>
 
                   </tr>
-
                 ))
-
               )}
-
             </tbody>
-
           </table>
-
         </div>
-
       )}
 
-
-      {/* ==========================================
-          UPDATE FORM
-      ========================================== */}
-
+      {/* UPDATE FORM */}
       {showForm && (
-
-        <div
-          id="product-update-form"
-          style={styles.formContainer}
-        >
+        <div id="product-update-form" style={styles.formContainer}>
 
           <div style={styles.formHeader}>
-
             <div>
-
-              <h3 style={styles.formTitle}>
-                Update Product
-              </h3>
-
+              <h3 style={styles.formTitle}>Update Product</h3>
               <p style={styles.formSubtitle}>
                 Edit the product information below
               </p>
-
             </div>
 
             <button
@@ -588,188 +408,117 @@ const ViewProduct = () => {
             >
               ×
             </button>
-
           </div>
 
-
-          <form
-            onSubmit={handleUpdateProduct}
-          >
-
+          <form onSubmit={handleUpdateProduct}>
             <div style={styles.formGrid}>
 
-              {/* PRODUCT ID */}
-
+              {/* ID */}
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Product ID
-                </label>
-
+                <label style={styles.label}>Product ID</label>
                 <input
                   type="text"
                   value={formData.productId}
                   readOnly
-                  style={{
-                    ...styles.input,
-                    backgroundColor:
-                      '#f1f5f9'
-                  }}
+                  style={{ ...styles.input, backgroundColor: '#f1f5f9' }}
                 />
-
               </div>
 
-
-              {/* PRODUCT NAME */}
-
+              {/* NAME */}
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Product Name
-                </label>
-
+                <label style={styles.label}>Product Name</label>
                 <input
                   id="productName"
                   type="text"
-                  value={
-                    formData.productName
-                  }
-                  onChange={
-                    handleInputChange
-                  }
+                  value={formData.productName}
+                  onChange={handleInputChange}
                   style={styles.input}
                   required
                 />
-
               </div>
 
-
-              {/* DESCRIPTION */}
-
+              {/* DESCRIPTION (NEW) */}
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Description
-                </label>
-
-                <input
-                  id="description"
-                  type="text"
-                  value={
-                    formData.description
-                  }
-                  onChange={
-                    handleInputChange
-                  }
-                  style={styles.input}
+                <label style={styles.label}>Product Description</label>
+                <textarea
+                  id="productDescription"
+                  value={formData.productDescription}
+                  onChange={handleInputChange}
+                  style={{ ...styles.input, resize: 'vertical', minHeight: '80px' }}
+                  required
                 />
-
               </div>
-
 
               {/* QUANTITY */}
-
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Quantity
-                </label>
-
+                <label style={styles.label}>Quantity</label>
                 <input
-                  id="quantity"
+                  id="productQuantity"
                   type="number"
                   min="0"
-                  value={
-                    formData.quantity
-                  }
-                  onChange={
-                    handleInputChange
-                  }
+                  value={formData.productQuantity}
+                  onChange={handleInputChange}
                   style={styles.input}
                   required
                 />
-
               </div>
 
-
               {/* PRICE */}
-
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Price
-                </label>
-
+                <label style={styles.label}>Price</label>
                 <input
                   id="price"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={
-                    formData.price
-                  }
-                  onChange={
-                    handleInputChange
-                  }
+                  value={formData.price}
+                  onChange={handleInputChange}
                   style={styles.input}
                   required
                 />
-
               </div>
 
-
-              {/* CATEGORY */}
-
+              {/* RECEIPT DATE */}
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Category
-                </label>
-
+                <label style={styles.label}>Receipt Date</label>
                 <input
-                  id="category"
-                  type="text"
-                  value={
-                    formData.category
-                  }
-                  onChange={
-                    handleInputChange
-                  }
+                  id="receiptDate"
+                  type="date"
+                  value={formData.receiptDate}
+                  onChange={handleInputChange}
                   style={styles.input}
+                  required
                 />
-
               </div>
 
+              {/* ISSUE DATE */}
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Issue Date</label>
+                <input
+                  id="issueDate"
+                  type="date"
+                  value={formData.issueDate}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  required
+                />
+              </div>
 
               {/* SUPPLIER */}
-
               <div style={styles.inputGroup}>
-
-                <label style={styles.label}>
-                  Supplier
-                </label>
-
+                <label style={styles.label}>Supplier Name</label>
                 <input
-                  id="supplier"
+                  id="supplierName"
                   type="text"
-                  value={
-                    formData.supplier
-                  }
-                  onChange={
-                    handleInputChange
-                  }
+                  value={formData.supplierName}
+                  onChange={handleInputChange}
                   style={styles.input}
+                  required
                 />
-
               </div>
 
             </div>
 
-
-            {/* FORM BUTTONS */}
-
             <div style={styles.formButtons}>
-
               <button
                 type="button"
                 onClick={handleCancel}
@@ -784,64 +533,35 @@ const ViewProduct = () => {
                 style={styles.saveButton}
                 disabled={saving}
               >
-                {saving
-                  ? 'Updating...'
-                  : 'Update Product'}
+                {saving ? 'Updating...' : 'Update Product'}
               </button>
-
             </div>
 
           </form>
-
         </div>
-
       )}
 
-
-      {/* ==========================================
-          INTERNAL CSS
-      ========================================== */}
-
       <style>{`
-
-        * {
-          box-sizing: border-box;
-        }
-
-        button {
-          font-family: inherit;
-        }
-
-        button:hover {
-          opacity: 0.9;
-        }
-
-        table tbody tr:hover {
-          background-color: #f8fafc;
-        }
-
+        * { box-sizing: border-box; }
+        button { font-family: inherit; }
+        button:hover { opacity: 0.9; }
+        table tbody tr:hover { background-color: #f8fafc; }
       `}</style>
 
     </div>
   );
 };
 
-
 // ======================================================
-// STYLES
+// STYLES (unchanged — kept the same as your file)
 // ======================================================
-
 const styles = {
-
   page: {
     padding: '30px',
     backgroundColor: '#f8fafc',
     minHeight: '100vh',
-    fontFamily:
-      'Arial, Helvetica, sans-serif'
+    fontFamily: 'Arial, Helvetica, sans-serif'
   },
-
-
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -849,22 +569,8 @@ const styles = {
     marginBottom: '25px',
     gap: '20px'
   },
-
-
-  title: {
-    margin: 0,
-    color: '#1e293b',
-    fontSize: '28px'
-  },
-
-
-  subtitle: {
-    marginTop: '6px',
-    color: '#64748b',
-    fontSize: '14px'
-  },
-
-
+  title: { margin: 0, color: '#1e293b', fontSize: '28px' },
+  subtitle: { marginTop: '6px', color: '#64748b', fontSize: '14px' },
   addButton: {
     border: 'none',
     backgroundColor: '#2563eb',
@@ -874,11 +580,8 @@ const styles = {
     cursor: 'pointer',
     fontSize: '15px',
     fontWeight: '600',
-    boxShadow:
-      '0 4px 10px rgba(37, 99, 235, 0.25)'
+    boxShadow: '0 4px 10px rgba(37, 99, 235, 0.25)'
   },
-
-
   error: {
     backgroundColor: '#fee2e2',
     color: '#b91c1c',
@@ -886,8 +589,6 @@ const styles = {
     borderRadius: '8px',
     marginBottom: '20px'
   },
-
-
   loading: {
     backgroundColor: 'white',
     padding: '40px',
@@ -895,24 +596,13 @@ const styles = {
     borderRadius: '10px',
     color: '#64748b'
   },
-
-
   tableContainer: {
     backgroundColor: 'white',
     borderRadius: '12px',
     overflowX: 'auto',
-    boxShadow:
-      '0 4px 15px rgba(0,0,0,0.06)'
+    boxShadow: '0 4px 15px rgba(0,0,0,0.06)'
   },
-
-
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    minWidth: '1000px'
-  },
-
-
+  table: { width: '100%', borderCollapse: 'collapse', minWidth: '1000px' },
   th: {
     backgroundColor: '#1e40af',
     color: 'white',
@@ -921,29 +611,14 @@ const styles = {
     fontSize: '14px',
     whiteSpace: 'nowrap'
   },
-
-
   td: {
     padding: '13px 12px',
-    borderBottom:
-      '1px solid #e2e8f0',
+    borderBottom: '1px solid #e2e8f0',
     color: '#334155',
     fontSize: '14px'
   },
-
-
-  row: {
-    transition: 'background-color 0.2s'
-  },
-
-
-  noProducts: {
-    padding: '35px',
-    textAlign: 'center',
-    color: '#64748b'
-  },
-
-
+  row: { transition: 'background-color 0.2s' },
+  noProducts: { padding: '35px', textAlign: 'center', color: '#64748b' },
   stockAvailable: {
     backgroundColor: '#dcfce7',
     color: '#15803d',
@@ -952,8 +627,6 @@ const styles = {
     fontWeight: '600',
     fontSize: '12px'
   },
-
-
   stockEmpty: {
     backgroundColor: '#fee2e2',
     color: '#dc2626',
@@ -962,14 +635,7 @@ const styles = {
     fontWeight: '600',
     fontSize: '12px'
   },
-
-
-  actions: {
-    display: 'flex',
-    gap: '8px'
-  },
-
-
+  actions: { display: 'flex', gap: '8px' },
   updateButton: {
     border: 'none',
     backgroundColor: '#16a34a',
@@ -979,8 +645,6 @@ const styles = {
     cursor: 'pointer',
     fontWeight: '600'
   },
-
-
   deleteButton: {
     border: 'none',
     backgroundColor: '#dc2626',
@@ -990,39 +654,21 @@ const styles = {
     cursor: 'pointer',
     fontWeight: '600'
   },
-
-
   formContainer: {
     backgroundColor: 'white',
     marginTop: '30px',
     padding: '25px',
     borderRadius: '12px',
-    boxShadow:
-      '0 4px 15px rgba(0,0,0,0.08)'
+    boxShadow: '0 4px 15px rgba(0,0,0,0.08)'
   },
-
-
   formHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '25px'
   },
-
-
-  formTitle: {
-    margin: 0,
-    color: '#1e293b'
-  },
-
-
-  formSubtitle: {
-    marginTop: '5px',
-    color: '#64748b',
-    fontSize: '13px'
-  },
-
-
+  formTitle: { margin: 0, color: '#1e293b' },
+  formSubtitle: { marginTop: '5px', color: '#64748b', fontSize: '13px' },
   closeButton: {
     border: 'none',
     backgroundColor: '#fee2e2',
@@ -1033,61 +679,41 @@ const styles = {
     fontSize: '22px',
     cursor: 'pointer'
   },
-
-
   formGrid: {
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(250px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
     gap: '20px'
   },
-
-
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-
-
+  inputGroup: { display: 'flex', flexDirection: 'column' },
   label: {
     marginBottom: '7px',
     fontWeight: '600',
     color: '#334155',
     fontSize: '14px'
   },
-
-
   input: {
     width: '100%',
     padding: '11px 12px',
-    border:
-      '1px solid #cbd5e1',
+    border: '1px solid #cbd5e1',
     borderRadius: '7px',
     outline: 'none',
     fontSize: '14px'
   },
-
-
   formButtons: {
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '12px',
     marginTop: '25px'
   },
-
-
   cancelButton: {
     padding: '11px 20px',
-    border:
-      '1px solid #cbd5e1',
+    border: '1px solid #cbd5e1',
     backgroundColor: 'white',
     color: '#475569',
     borderRadius: '7px',
     cursor: 'pointer',
     fontWeight: '600'
   },
-
-
   saveButton: {
     padding: '11px 22px',
     border: 'none',
@@ -1097,8 +723,6 @@ const styles = {
     cursor: 'pointer',
     fontWeight: '600'
   }
-
 };
 
 export default ViewProduct;
-

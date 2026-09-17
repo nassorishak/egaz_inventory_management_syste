@@ -1,3 +1,4 @@
+ 
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -9,6 +10,7 @@ const AddProduct = () => {
   const [issueDate, setIssueDate] = useState('');
   const [price, setPrice] = useState('');
   const [supplierName, setSupplierName] = useState('');
+  const [productDescription, setProductDescription] = useState('');
 
   // Selected Department ID
   const [departmentId, setDepartmentId] = useState('');
@@ -34,10 +36,16 @@ const AddProduct = () => {
           'http://localhost:8080/api/departments'
         );
 
-        setDepartments(response.data);
+        setDepartments(
+          Array.isArray(response.data) ? response.data : []
+        );
 
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error(
+          'Error fetching departments:',
+          error.response?.data || error.message
+        );
+
         setError('Failed to load departments.');
       } finally {
         setDepartmentLoading(false);
@@ -64,24 +72,131 @@ const AddProduct = () => {
       return;
     }
 
-    const productData = {
-      ProductName: productName,
-      ProductQuantity: productQuantity,
-      ReceiptDate: receiptDate,
-      IssueDate: issueDate,
-      Price: parseInt(price, 10),
-      SupplierName: supplierName,
+    // Validate product name
+    if (!productName.trim()) {
+      setError('Product name is required.');
+      setLoading(false);
+      return;
+    }
 
-      // Selected department
-      department: {
-        departmentId: parseInt(departmentId, 10)
-      }
+    // Validate product quantity
+    if (!productQuantity.trim()) {
+      setError('Product quantity is required.');
+      setLoading(false);
+      return;
+    }
+
+    // Validate price
+    if (!price || isNaN(parseInt(price, 10))) {
+      setError('Product price is required.');
+      setLoading(false);
+      return;
+    }
+
+    // Validate receipt date
+    if (!receiptDate) {
+      setError('Receipt date is required.');
+      setLoading(false);
+      return;
+    }
+
+    // Validate issue date
+    if (!issueDate) {
+      setError('Issue date is required.');
+      setLoading(false);
+      return;
+    }
+
+    // Validate supplier
+    if (!supplierName.trim()) {
+      setError('Supplier name is required.');
+      setLoading(false);
+      return;
+    }
+    // Validate productDescription
+    if (!productDescription.trim()) {
+      setError('prductDescription.');
+      setLoading(false);
+      return;
+    }
+    /*
+     * Get logged-in user ID
+     *
+     * This value must have been stored during login.
+     */
+    const userId = localStorage.getItem('userId');
+
+    console.log('Logged-in User ID:', userId);
+
+    if (!userId) {
+      setError(
+        'No logged-in user was found. Please login again.'
+      );
+      setLoading(false);
+      return;
+    }
+
+    /*
+     * Product data
+     *
+     * These names MUST match Product.java:
+     *
+     * productName
+     * productQuantity
+     * receiptDate
+     * issueDate
+     * price
+     * supplierName
+     */
+    const productData = {
+      productName: productName.trim(),
+      productQuantity: productQuantity.trim(),
+      receiptDate: receiptDate,
+      issueDate: issueDate,
+      price: parseInt(price, 10),
+      supplierName: supplierName.trim(),
+      productDescription: productDescription.trim(),
+      departmentId: parseInt(departmentId, 10)  
     };
 
+    console.log(
+      'Product data being sent to backend:',
+      productData
+    );
+
+    console.log(
+      'Selected department ID:',
+      departmentId
+    );
+
     try {
-      await axios.post(
-        'http://localhost:8080/api/products/create',
-        productData
+
+      /*
+       * IMPORTANT:
+       *
+       * userId is sent to Spring Boot as:
+       *
+       * /create?userId=1
+       *
+       * The backend will find this User and execute:
+       *
+       * product.setUser(user);
+       *
+       * This will save user_id in the product table.
+       */
+      const response = await axios.post(
+        `http://localhost:8080/api/products/create?userId=${encodeURIComponent(userId)}`,
+        productData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log(
+        'Product added successfully:',
+        response.data
       );
 
       setSuccess('Product added successfully!');
@@ -94,14 +209,34 @@ const AddProduct = () => {
       setPrice('');
       setSupplierName('');
       setDepartmentId('');
+      setProductDescription('');
 
     } catch (error) {
-      console.error('Error adding product:', error);
 
-      setError(
-        error.response?.data?.message ||
-        'Failed to add product. Please try again.'
+      console.error(
+        'Error adding product:',
+        error.response?.data || error.message
       );
+
+      /*
+       * Display backend error
+       */
+      const backendError = error.response?.data;
+
+      if (typeof backendError === 'string') {
+
+        setError(backendError);
+
+      } else if (backendError?.message) {
+
+        setError(backendError.message);
+
+      } else {
+
+        setError(
+          'Failed to add product. Please check the entered information.'
+        );
+      }
 
     } finally {
       setLoading(false);
@@ -498,6 +633,29 @@ const AddProduct = () => {
 
                 </div>
 
+                 {/* PRODUCT DESCRIPTION */}
+
+<div className="form-group full-width">
+
+  <label htmlFor="productDescription">
+    Product Description
+    <span className="required">*</span>
+  </label>
+
+  <textarea
+    id="productDescription"
+    className="product-input"
+    placeholder="Enter product description"
+    value={productDescription}
+    onChange={(e) =>
+      setProductDescription(e.target.value)
+    }
+    required
+    disabled={loading}
+    rows={5}
+  />
+
+</div>
                 {/* PRICE */}
 
                 <div className="form-group">
