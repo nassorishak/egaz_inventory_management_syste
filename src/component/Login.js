@@ -79,7 +79,7 @@ const Login = () => {
         <div style={styles.leftSection}>
           <div style={styles.logoContainer}>
             <img
-              src="/pump.jpg"
+              src="/egaz.jpg"
               alt="System Logo"
               style={styles.logo}
               onError={(e) => {
@@ -122,7 +122,7 @@ const Login = () => {
         {/* Right Side */}
         <div style={styles.rightSection}>
           <div style={styles.header}>
-            <h2 style={styles.title}>Welcome Back</h2>
+            <h2 style={styles.title}>WELCOME TO LOGIN </h2>
             <p style={styles.subtitle}>
               Sign in to access your dashboard
             </p>

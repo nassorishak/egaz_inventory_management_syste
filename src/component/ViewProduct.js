@@ -209,41 +209,45 @@ const ViewProduct = () => {
       setSaving(false);
     }
   };
+// ==============================
+// DELETE PRODUCT
+// ==============================
+const handleDeleteProduct = async (productId) => {
+  const confirmDelete = window.confirm(
+    'Are you sure you want to delete this product?'
+  );
 
-  // ==============================
-  // DELETE PRODUCT
-  // ==============================
-  const handleDeleteProduct = async (productId) => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this product?'
-    );
+  if (!confirmDelete) return;
 
-    if (!confirmDelete) return;
+  try {
+    setError('');
 
-    try {
-      setError('');
+    console.log('Deleting product ID:', productId);
 
-      const response = await fetch(
-        `${apiUrl}/delete/${productId}`,
-        { method: 'DELETE' }
-      );
+    const response = await fetch(`${apiUrl}/delete/${productId}`, {
+      method: 'DELETE',
+      headers: { 'Accept': 'text/plain, application/json' }
+    });
 
-      const responseText = await response.text();
+    const responseText = await response.text();
 
-      if (!response.ok) {
-        throw new Error(responseText || 'Failed to delete product');
-      }
+    console.log('Delete response status:', response.status);
+    console.log('Delete response text:', responseText);
 
-      alert('Product deleted successfully!');
-      await fetchProducts();
-
-    } catch (err) {
-      console.error('Error deleting product:', err);
-      setError(err.message || 'Error deleting product.');
-      alert(`Error deleting product: ${err.message || 'Unknown error'}`);
+    if (!response.ok) {
+      throw new Error(responseText || 'Failed to delete product');
     }
-  };
 
+    // Refresh the list first, then alert
+    await fetchProducts();
+    alert('Product deleted successfully!');
+
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    setError(err.message || 'Error deleting product.');
+    alert(err.message || 'Error deleting product.');
+  }
+};
   // ==============================
   // CLEAR FORM
   // ==============================

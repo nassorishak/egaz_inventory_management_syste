@@ -620,16 +620,38 @@ const Registration = () => {
 
           <div className="registration-left">
 
-            <div className="logo-container">
-              <img
-                src="/pump.jpg"
-                alt="System Logo"
-                className="logo"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
+           <div
+  style={{
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: '24px',
+    borderRadius: '8px;'
+  }}
+>
+  <img
+    src="/egaz.jpg"
+    alt="System Logo"
+    style={{
+      width: '100%',
+      maxWidth: '150px',
+      height: '140px',
+      objectFit: 'contain',
+      padding: '19px',
+      background: 'rgba(255, 255, 255, 0.08)',
+      border: '2px solid rgba(255, 255, 255, 0.25)',
+      borderRadius: '70px',
+      boxShadow:
+        '0 10px 25px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+      backdropFilter: 'blur(6px)',
+      WebkitBackdropFilter: 'blur(6px)',
+    }}
+    onError={(e) => {
+      e.target.style.display = 'none';
+    }}
+  />
+</div>
 
             <h1 className="system-title">
               INVENTORY

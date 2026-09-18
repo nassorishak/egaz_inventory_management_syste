@@ -36,48 +36,47 @@ const RequestProduct = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
+  e.preventDefault();
+  setError('');
+  setSuccess('');
 
-    if (!userId) { setError('Please log in again.'); return; }
-    if (!productId) { setError('Please select a product.'); return; }
-    if (!departmentId) { setError('Please select a department.'); return; }
-    if (!quantity || Number(quantity) <= 0) {
-      setError('Please enter a valid quantity.'); return;
-    }
-    if (!issueDate) { setError('Please choose an issue date.'); return; }
-    if (!description.trim()) {
-      setError('Please type the product description.'); return;   // ✅ required
-    }
+  if (!userId) { setError('Please log in again.'); return; }
+  if (!productId) { setError('Please select a product.'); return; }
+  if (!departmentId) { setError('Please select a department.'); return; }
+  if (!quantity || Number(quantity) <= 0) {
+    setError('Please enter a valid quantity.'); return;
+  }
+  if (!issueDate) { setError('Please choose an issue date.'); return; }
+  if (!description.trim()) {
+    setError('Please type the product description.'); return;
+  }
 
-    try {
-      setLoading(true);
-      await axios.post(
-        `http://localhost:8080/api/product-requests/create?userId=${userId}`,
-        {
-          productId: parseInt(productId, 10),
-          departmentId: parseInt(departmentId, 10),
-          quantity: parseInt(quantity, 10),
-          issueDate: issueDate,
-          description: description.trim(),        // ✅ sent to backend
-        },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+  try {
+    setLoading(true);
 
-      setSuccess('Your request has been sent to the Admin successfully!');
-      setProductId('');
-      setDepartmentId('');
-      setQuantity('');
-      setIssueDate('');
-      setDescription('');
-    } catch (err) {
-      const msg = err.response?.data;
-      setError(typeof msg === 'string' ? msg : 'Failed to submit request.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    await axios.post(
+      `http://localhost:8080/api/product-requests/create?userId=${userId}&productId=${productId}&departmentId=${departmentId}`,
+      {
+        quantity: parseInt(quantity, 10),
+        issueDate: issueDate,
+        description: description.trim(),
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    setSuccess('Your request has been sent to the Admin successfully!');
+    setProductId('');
+    setDepartmentId('');
+    setQuantity('');
+    setIssueDate('');
+    setDescription('');
+  } catch (err) {
+    const msg = err.response?.data;
+    setError(typeof msg === 'string' ? msg : 'Failed to submit request.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const selected = products.find(
     (p) => String(p.productId) === String(productId)
