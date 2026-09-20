@@ -9,8 +9,8 @@ const Registration = () => {
     password: '',
     gender: 'Male',
     phoneNumber: '',
-    departmentId: '1',
-    role: 'Staff',
+    departmentId: '',
+    role: '',
   });
 
   const [departments, setDepartments] = useState([]);
@@ -926,6 +926,9 @@ const Registration = () => {
                   required
                   className="form-select"
                 >
+                    <option value="SupperAdmin">
+                    SupperAdmin
+                  </option>
 
                   <option value="Admin">
                     Admin

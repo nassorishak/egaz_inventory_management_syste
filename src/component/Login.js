@@ -33,22 +33,23 @@ const Login = () => {
         return;
       }
 
-      // Save user information
-      localStorage.setItem('role', user.role);
-      localStorage.setItem('userId', user.userId);
+    // Save user information
+localStorage.setItem('role', user.role);
+localStorage.setItem('userId', user.userId);
+localStorage.setItem('userName', user.userName || user.name || '');
 
-      // Navigate according to role
-      const role = user.role?.toUpperCase();
+// Navigate according to role
+const role = (user.role || '').trim().toUpperCase();
 
-      if (role === 'STAFF') {
-        navigate('/staff-dashboard');
-      } else if (role === 'ADMIN') {
-        navigate('/admin-dashboard');
-      } else {
-        setError(
-          'Access denied: Only Staff and Admin accounts are allowed to log in here.'
-        );
-      }
+if (role === 'STAFF') {
+  navigate('/staff-dashboard');
+} else if (role === 'ADMIN') {
+  navigate('/admin-dashboard');
+} else if (role === 'SUPPER-ADMIN' || role === 'SUPERADMIN' || role === 'SUPPERADMIN') {
+  navigate('/super-admin-dashboard');
+} else {
+  setError('Access denied: invalid user role.');
+}
     } catch (err) {
       console.error('Login error:', err);
 
@@ -240,7 +241,7 @@ const Login = () => {
           </Link>
 
           <p style={styles.footerText}>
-            Staff & Admin Portal
+            Staff & Admin & Supper-AdminPortal
           </p>
         </div>
       </div>

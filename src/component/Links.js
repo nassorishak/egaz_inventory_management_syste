@@ -12,6 +12,17 @@ const Links = {
               { label: 'ManageRequest', path: '/manage-request', icon: faCog },
     { label: 'Logout', path: '/', icon: faSignOutAlt } 
   ],
+
+    SUPPER_ADMIN: [
+    { label: 'Dashboard', path: '/supper-admin-dashboard', icon: faChartBar },
+    // { label: 'Manage Users', path: '/manage-users', icon: faUsers },
+    { label: 'AddProduct', path: '/add-product', icon: faCog },
+    { label: 'AddDepartment', path: '/add-department', icon: faCog },
+        { label: 'ManageUsers', path: '/system-users', icon: faCog },
+            { label: 'ViewProduct', path: '/view-product', icon: faCog },
+              { label: 'ManageRequest', path: '/manage-request', icon: faCog },
+    { label: 'Logout', path: '/', icon: faSignOutAlt } 
+  ],
   // STAFF: [
   //   { label: 'Dashboard', path: '/staff-dashboard', icon: faChartBar },
   //   { label: 'RequestedProduct', path: '/requested-product', icon: faTasks },
