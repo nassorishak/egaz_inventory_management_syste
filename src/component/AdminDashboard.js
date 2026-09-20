@@ -1,14 +1,107 @@
 
-// import React from 'react';
+
+// import React, { useState, useEffect } from 'react';
 
 // const AdminDashboard = () => {
+//   const [departments, setDepartments] = useState([]);
+//   const [showDepartments, setShowDepartments] = useState(false);
+//   const [loading, setLoading] = useState(false);
+//   const [showReportOptions, setShowReportOptions] = useState(false);
+
+//   // Fetch departments when the modal is opened
+//   useEffect(() => {
+//     if (showDepartments) {
+//       fetchDepartments();
+//     }
+//   }, [showDepartments]);
+
+//   const fetchDepartments = async () => {
+//     setLoading(true);
+//     try {
+//       const response = await fetch('http://localhost:8080/api/departments');
+//       if (!response.ok) throw new Error('Failed to fetch departments');
+//       const data = await response.json();
+//       setDepartments(data);
+//     } catch (error) {
+//       console.error('Error fetching departments:', error);
+//       alert('Failed to load departments. Please try again.');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//  // Proper file download: fetch as blob, then trigger download via hidden link
+// const handleDownloadReport = async (type) => {
+//   const url =
+//     type === 'pdf'
+//       ? 'http://localhost:8080/api/products/report/pdf'
+//       : 'http://localhost:8080/api/products/report/excel';
+
+//   try {
+//     const response = await fetch(url, {
+//       method: 'GET',
+//       headers: {
+//         Accept:
+//           type === 'pdf'
+//             ? 'application/pdf'
+//             : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//       },
+//     });
+
+//     if (!response.ok) {
+//       // Try to read the error body for a better message
+//       let errorMsg = `Server responded with ${response.status}`;
+//       try {
+//         const errText = await response.text();
+//         if (errText) errorMsg = errText;
+//       } catch (_) {
+//         /* ignore */
+//       }
+//       throw new Error(errorMsg);
+//     }
+
+//     const blob = await response.blob();
+
+//     // Guard against empty files (often caused by a backend error with 200 status)
+//     if (blob.size === 0) {
+//       throw new Error('Received an empty file from the server.');
+//     }
+
+//     // Try to get filename from Content-Disposition header
+//     const disposition = response.headers.get('Content-Disposition');
+//     let filename = type === 'pdf' ? 'product-report.pdf' : 'product-report.xlsx';
+//     if (disposition && disposition.indexOf('filename=') !== -1) {
+//       const match = disposition.match(/filename\*?=["']?([^"';]+)["']?/);
+//       if (match && match[1]) {
+//         filename = decodeURIComponent(match[1]);
+//       }
+//     }
+
+//     // Create a temporary object URL and click a hidden anchor
+//     const blobUrl = window.URL.createObjectURL(blob);
+//     const link = document.createElement('a');
+//     link.href = blobUrl;
+//     link.download = filename;
+//     link.style.display = 'none';
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+//     window.URL.revokeObjectURL(blobUrl);
+
+//     setShowReportOptions(false);
+//   } catch (error) {
+//     console.error('Error downloading report:', error);
+//     alert(`Failed to download report: ${error.message}`);
+//   }
+// };
+
 //   const cards = [
 //     {
 //       title: 'Products',
 //       icon: '📦',
 //       description: 'Download a report of all registered products.',
 //       color: '#3b82f6',
-//       actions: [{ label: 'Download Product Report', path: '/api/products/report' }],
+//       actions: [{ label: 'Download Product Report', type: 'report' }],
 //     },
 //     {
 //       title: 'Requested Products',
@@ -22,16 +115,55 @@
 //       icon: '🏢',
 //       description: 'View all registered departments in the system.',
 //       color: '#10b981',
-//       actions: [{ label: 'List Registered Departments', path: '/add-department' }],
+//       actions: [{ label: 'List Registered Departments', type: 'departments' }],
 //     },
 //   ];
 
 //   const handleAction = (action) => {
-//     if (action.label === 'Download Product Report') {
-//       window.open(`http://localhost:8080${action.path}`, '_blank');
-//     } else {
+//     if (action.type === 'report') {
+//       setShowReportOptions(true);
+//     } else if (action.type === 'departments') {
+//       setShowDepartments(true);
+//     } else if (action.path) {
 //       window.location.href = action.path;
 //     }
+//   };
+
+//   // Modal styles
+//   const modalOverlay = {
+//     position: 'fixed',
+//     top: 0,
+//     left: 0,
+//     right: 0,
+//     bottom: 0,
+//     backgroundColor: 'rgba(0,0,0,0.5)',
+//     display: 'flex',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     zIndex: 1000,
+//   };
+
+//   const modalContent = {
+//     backgroundColor: '#fff',
+//     borderRadius: '12px',
+//     padding: '30px',
+//     maxWidth: '700px',
+//     width: '90%',
+//     maxHeight: '80vh',
+//     overflowY: 'auto',
+//     boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+//   };
+
+//   const closeButton = {
+//     marginTop: '20px',
+//     padding: '10px 24px',
+//     border: 'none',
+//     borderRadius: '7px',
+//     backgroundColor: '#e2e8f0',
+//     color: '#1e293b',
+//     fontSize: '14px',
+//     fontWeight: '600',
+//     cursor: 'pointer',
 //   };
 
 //   return (
@@ -117,8 +249,110 @@
 //           </div>
 //         ))}
 //       </div>
+
+//       {/* Report Options Modal */}
+//       {showReportOptions && (
+//         <div style={modalOverlay} onClick={() => setShowReportOptions(false)}>
+//           <div style={modalContent} onClick={(e) => e.stopPropagation()}>
+//             <h2 style={{ marginTop: 0, color: '#1e293b' }}>Download Product Report</h2>
+//             <p style={{ color: '#64748b', marginBottom: '24px' }}>
+//               Choose the format for your product report:
+//             </p>
+//             <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+//               <button
+//                 onClick={() => handleDownloadReport('pdf')}
+//                 style={{
+//                   flex: 1,
+//                   minWidth: '140px',
+//                   padding: '14px 20px',
+//                   border: 'none',
+//                   borderRadius: '8px',
+//                   backgroundColor: '#ef4444',
+//                   color: '#fff',
+//                   fontSize: '15px',
+//                   fontWeight: '600',
+//                   cursor: 'pointer',
+//                 }}
+//               >
+//                 📄 Download PDF
+//               </button>
+//               <button
+//                 onClick={() => handleDownloadReport('excel')}
+//                 style={{
+//                   flex: 1,
+//                   minWidth: '140px',
+//                   padding: '14px 20px',
+//                   border: 'none',
+//                   borderRadius: '8px',
+//                   backgroundColor: '#16a34a',
+//                   color: '#fff',
+//                   fontSize: '15px',
+//                   fontWeight: '600',
+//                   cursor: 'pointer',
+//                 }}
+//               >
+//                 📊 Download Excel
+//               </button>
+//             </div>
+//             <div style={{ textAlign: 'right' }}>
+//               <button style={closeButton} onClick={() => setShowReportOptions(false)}>
+//                 Cancel
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Departments Modal */}
+//       {showDepartments && (
+//         <div style={modalOverlay} onClick={() => setShowDepartments(false)}>
+//           <div style={modalContent} onClick={(e) => e.stopPropagation()}>
+//             <h2 style={{ marginTop: 0, color: '#1e293b' }}>Registered Departments</h2>
+//             {loading ? (
+//               <p style={{ color: '#64748b' }}>Loading departments...</p>
+//             ) : departments.length === 0 ? (
+//               <p style={{ color: '#64748b' }}>No departments found.</p>
+//             ) : (
+//               <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+//                 <thead>
+//                   <tr style={{ backgroundColor: '#f1f5f9' }}>
+//                     <th style={thStyle}>Department Name</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {departments.map((dept) => (
+//                     <tr key={dept.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+//                       <td style={tdStyle}>{dept.name || dept.departmentName}</td>
+//                     </tr>
+//                   ))}
+//                 </tbody>
+//               </table>
+//             )}
+//             <div style={{ textAlign: 'right' }}>
+//               <button style={closeButton} onClick={() => setShowDepartments(false)}>
+//                 Close
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
 //     </div>
 //   );
+// };
+
+// // Inline table styles
+// const thStyle = {
+//   padding: '12px 16px',
+//   textAlign: 'left',
+//   fontSize: '14px',
+//   color: '#334155',
+//   fontWeight: '600',
+// };
+
+// const tdStyle = {
+//   padding: '12px 16px',
+//   fontSize: '14px',
+//   color: '#475569',
 // };
 
 // export default AdminDashboard;
@@ -130,6 +364,8 @@ const AdminDashboard = () => {
   const [showDepartments, setShowDepartments] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showReportOptions, setShowReportOptions] = useState(false);
+  const [downloadingType, setDownloadingType] = useState(null);
+  const [reportError, setReportError] = useState('');
 
   // Fetch departments when the modal is opened
   useEffect(() => {
@@ -153,70 +389,74 @@ const AdminDashboard = () => {
     }
   };
 
- // Proper file download: fetch as blob, then trigger download via hidden link
-const handleDownloadReport = async (type) => {
-  const url =
-    type === 'pdf'
-      ? 'http://localhost:8080/api/products/report/pdf'
-      : 'http://localhost:8080/api/products/report/excel';
+  // ============ DOWNLOAD REPORT (PDF / EXCEL) ============
+  const handleDownloadReport = async (type) => {
+    setDownloadingType(type);
+    setReportError('');
 
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept:
-          type === 'pdf'
-            ? 'application/pdf'
-            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      },
-    });
+    const url =
+      type === 'pdf'
+        ? 'http://localhost:8080/api/products'
+        : 'http://localhost:8080/api/products/report/excel';
 
-    if (!response.ok) {
-      // Try to read the error body for a better message
-      let errorMsg = `Server responded with ${response.status}`;
-      try {
-        const errText = await response.text();
-        if (errText) errorMsg = errText;
-      } catch (_) {
-        /* ignore */
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept:
+            type === 'pdf'
+              ? 'application/pdf'
+              : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        },
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Server responded with ${response.status}`;
+        try {
+          const errText = await response.text();
+          if (errText) errorMsg = errText;
+        } catch (_) {
+          /* ignore */
+        }
+        throw new Error(errorMsg);
       }
-      throw new Error(errorMsg);
-    }
 
-    const blob = await response.blob();
+      const blob = await response.blob();
 
-    // Guard against empty files (often caused by a backend error with 200 status)
-    if (blob.size === 0) {
-      throw new Error('Received an empty file from the server.');
-    }
-
-    // Try to get filename from Content-Disposition header
-    const disposition = response.headers.get('Content-Disposition');
-    let filename = type === 'pdf' ? 'product-report.pdf' : 'product-report.xlsx';
-    if (disposition && disposition.indexOf('filename=') !== -1) {
-      const match = disposition.match(/filename\*?=["']?([^"';]+)["']?/);
-      if (match && match[1]) {
-        filename = decodeURIComponent(match[1]);
+      if (blob.size === 0) {
+        throw new Error('Received an empty file from the server.');
       }
+
+      // Get filename from Content-Disposition header
+      const disposition = response.headers.get('Content-Disposition');
+      let filename = type === 'pdf' ? 'product-report.pdf' : 'product-report.xlsx';
+      if (disposition && disposition.indexOf('filename=') !== -1) {
+        const match = disposition.match(/filename\*?=["']?([^"';]+)["']?/);
+        if (match && match[1]) {
+          filename = decodeURIComponent(match[1]);
+        }
+      }
+
+      // Trigger download
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      // Close modal on success
+      setShowReportOptions(false);
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      setReportError(error.message);
+    } finally {
+      setDownloadingType(null);
     }
-
-    // Create a temporary object URL and click a hidden anchor
-    const blobUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = filename;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(blobUrl);
-
-    setShowReportOptions(false);
-  } catch (error) {
-    console.error('Error downloading report:', error);
-    alert(`Failed to download report: ${error.message}`);
-  }
-};
+  };
 
   const cards = [
     {
@@ -244,6 +484,7 @@ const handleDownloadReport = async (type) => {
 
   const handleAction = (action) => {
     if (action.type === 'report') {
+      setReportError('');
       setShowReportOptions(true);
     } else if (action.type === 'departments') {
       setShowDepartments(true);
@@ -252,7 +493,7 @@ const handleDownloadReport = async (type) => {
     }
   };
 
-  // Modal styles
+  // ============ STYLES ============
   const modalOverlay = {
     position: 'fixed',
     top: 0,
@@ -270,7 +511,7 @@ const handleDownloadReport = async (type) => {
     backgroundColor: '#fff',
     borderRadius: '12px',
     padding: '30px',
-    maxWidth: '700px',
+    maxWidth: '600px',
     width: '90%',
     maxHeight: '80vh',
     overflowY: 'auto',
@@ -373,52 +614,129 @@ const handleDownloadReport = async (type) => {
         ))}
       </div>
 
-      {/* Report Options Modal */}
+      {/* ============ REPORT OPTIONS MODAL ============ */}
       {showReportOptions && (
-        <div style={modalOverlay} onClick={() => setShowReportOptions(false)}>
+        <div style={modalOverlay} onClick={() => !downloadingType && setShowReportOptions(false)}>
           <div style={modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ marginTop: 0, color: '#1e293b' }}>Download Product Report</h2>
-            <p style={{ color: '#64748b', marginBottom: '24px' }}>
-              Choose the format for your product report:
+            <h2 style={{ marginTop: 0, color: '#1e293b' }}>
+              📄 Download Product Report
+            </h2>
+            <p style={{ color: '#64748b', marginBottom: '20px' }}>
+              Choose the format you want to download:
             </p>
+
+            {/* Error message */}
+            {reportError && (
+              <div
+                style={{
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  border: '1px solid #fecaca',
+                  padding: '12px 15px',
+                  borderRadius: '8px',
+                  marginBottom: '18px',
+                  fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                ⚠️ {reportError}
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+              {/* PDF BUTTON */}
               <button
                 onClick={() => handleDownloadReport('pdf')}
+                disabled={downloadingType === 'pdf'}
                 style={{
                   flex: 1,
-                  minWidth: '140px',
-                  padding: '14px 20px',
+                  minWidth: '160px',
+                  padding: '20px 20px',
                   border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: '#ef4444',
+                  borderRadius: '10px',
+                  background:
+                    downloadingType === 'pdf'
+                      ? '#f87171'
+                      : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: '#fff',
                   fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
+                  fontWeight: '700',
+                  cursor: downloadingType === 'pdf' ? 'wait' : 'pointer',
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+                onMouseEnter={(e) => {
+                  if (downloadingType !== 'pdf') {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
                 }}
               >
-                📄 Download PDF
+                <span style={{ fontSize: '32px' }}>
+                  {downloadingType === 'pdf' ? '⏳' : '📄'}
+                </span>
+                {downloadingType === 'pdf' ? 'Downloading...' : 'Download PDF'}
               </button>
+
+              {/* EXCEL BUTTON */}
               <button
                 onClick={() => handleDownloadReport('excel')}
+                disabled={downloadingType === 'excel'}
                 style={{
                   flex: 1,
-                  minWidth: '140px',
-                  padding: '14px 20px',
+                  minWidth: '160px',
+                  padding: '20px 20px',
                   border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: '#16a34a',
+                  borderRadius: '10px',
+                  background:
+                    downloadingType === 'excel'
+                      ? '#4ade80'
+                      : 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
                   color: '#fff',
                   fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
+                  fontWeight: '700',
+                  cursor: downloadingType === 'excel' ? 'wait' : 'pointer',
+                  boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+                onMouseEnter={(e) => {
+                  if (downloadingType !== 'excel') {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(22, 163, 74, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(22, 163, 74, 0.3)';
                 }}
               >
-                📊 Download Excel
+                <span style={{ fontSize: '32px' }}>
+                  {downloadingType === 'excel' ? '⏳' : '📊'}
+                </span>
+                {downloadingType === 'excel' ? 'Downloading...' : 'Download Excel'}
               </button>
             </div>
+
             <div style={{ textAlign: 'right' }}>
-              <button style={closeButton} onClick={() => setShowReportOptions(false)}>
+              <button
+                style={closeButton}
+                onClick={() => setShowReportOptions(false)}
+                disabled={!!downloadingType}
+              >
                 Cancel
               </button>
             </div>
@@ -426,7 +744,7 @@ const handleDownloadReport = async (type) => {
         </div>
       )}
 
-      {/* Departments Modal */}
+      {/* ============ DEPARTMENTS MODAL ============ */}
       {showDepartments && (
         <div style={modalOverlay} onClick={() => setShowDepartments(false)}>
           <div style={modalContent} onClick={(e) => e.stopPropagation()}>
