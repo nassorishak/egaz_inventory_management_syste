@@ -273,10 +273,15 @@
 
 // export default MyRequests;
 
+// 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const MyRequests = () => {
+  const navigate = useNavigate();
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -310,6 +315,13 @@ const MyRequests = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  // ==========================================
+  // NAVIGATE TO REQUEST PRODUCT PAGE
+  // ==========================================
+  const handleRequestProduct = () => {
+    navigate('/request-product');
+  };
 
   // ==========================================
   // STATUS BADGE
@@ -347,13 +359,26 @@ const MyRequests = () => {
           </p>
         </div>
 
-        <button
-          onClick={load}
-          style={refreshBtn}
-          disabled={loading}
-        >
-          ⟳ Refresh
-        </button>
+        <div style={headerButtons}>
+          {/* ✅ Request Product button */}
+          <button
+            type="button"
+            onClick={handleRequestProduct}
+            style={requestProductBtn}
+          >
+            ➕ Request Product
+          </button>
+
+          {/* Refresh button */}
+          <button
+            type="button"
+            onClick={load}
+            style={refreshBtn}
+            disabled={loading}
+          >
+            ⟳ Refresh
+          </button>
+        </div>
       </div>
 
       {/* Error */}
@@ -394,9 +419,17 @@ const MyRequests = () => {
           <div style={{ fontWeight: 600, color: '#334155', marginBottom: 6 }}>
             You haven't submitted any requests yet
           </div>
-          <div style={{ fontSize: 13, color: '#64748b' }}>
-            Go to <b>Request a Product</b> to submit your first request.
+          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 22 }}>
+            Click <b>Request Product</b> below to submit your first request.
           </div>
+          {/* ✅ Second Request Product button in the empty state */}
+          <button
+            type="button"
+            onClick={handleRequestProduct}
+            style={requestProductBtn}
+          >
+            ➕ Request Product
+          </button>
         </div>
       ) : (
         <div style={tableContainer}>
@@ -505,6 +538,13 @@ const header = {
   flexWrap: 'wrap',
 };
 
+// ✅ NEW: container for the two header buttons
+const headerButtons = {
+  display: 'flex',
+  gap: 10,
+  flexWrap: 'wrap',
+};
+
 const title = { margin: 0, color: '#1e293b', fontSize: 28 };
 const subtitle = { marginTop: 6, color: '#64748b', fontSize: 14 };
 
@@ -517,6 +557,19 @@ const refreshBtn = {
   fontWeight: 600,
   cursor: 'pointer',
   fontSize: 14,
+};
+
+// ✅ NEW: Request Product button style (purple gradient)
+const requestProductBtn = {
+  padding: '10px 20px',
+  border: 'none',
+  borderRadius: 8,
+  background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+  color: '#fff',
+  fontWeight: 700,
+  cursor: 'pointer',
+  fontSize: 14,
+  boxShadow: '0 4px 12px rgba(139, 92, 246, 0.35)',
 };
 
 const errorBox = {

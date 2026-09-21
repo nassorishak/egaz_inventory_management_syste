@@ -1,7 +1,13 @@
+
+
+// export default  MyRequests;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const  MyRequests = () => {
+const MyRequests = () => {
+  const navigate = useNavigate();
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
@@ -58,6 +64,11 @@ const  MyRequests = () => {
     }
   };
 
+  // ===== Request to Admin (navigate to create-request page) =====
+  const handleRequestToAdmin = () => {
+    navigate('/admin-request-product');   // ⚠️ change to your real route
+  };
+
   // ===== Stats =====
   const pending   = requests.filter((r) => r.status === 'PENDING').length;
   const approved  = requests.filter((r) => r.status === 'APPROVED').length;
@@ -77,7 +88,15 @@ const  MyRequests = () => {
         }
         .mar-container { max-width: 1150px; margin: 0 auto; }
 
-        .mar-header { margin-bottom: 25px; }
+        .mar-header {
+          margin-bottom: 25px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        .mar-header-left { flex: 1; min-width: 250px; }
         .mar-header h1 {
           margin: 0; color: #172033;
           font-size: 30px; font-weight: 700;
@@ -85,6 +104,31 @@ const  MyRequests = () => {
         .mar-header p {
           margin: 8px 0 0; color: #718096;
           font-size: 15px;
+        }
+
+        /* ✅ Request to Admin button */
+        .mar-request-btn {
+          border: none;
+          background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+          color: #fff;
+          padding: 13px 24px;
+          border-radius: 10px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .mar-request-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 22px rgba(139, 92, 246, 0.45);
+        }
+        .mar-request-btn:active {
+          transform: translateY(0);
         }
 
         /* ===== STATS CARDS ===== */
@@ -251,6 +295,7 @@ const  MyRequests = () => {
           .mar-card { padding: 12px; overflow-x: auto; }
           .mar-table { min-width: 780px; }
           .mar-header h1 { font-size: 24px; }
+          .mar-request-btn { width: 100%; justify-content: center; }
         }
       `}</style>
 
@@ -259,8 +304,19 @@ const  MyRequests = () => {
 
           {/* HEADER */}
           <div className="mar-header">
-            <h1>  Super Admin Response</h1>
-            <p>Track the status of all your requests and complete approved ones.</p>
+            <div className="mar-header-left">
+              <h1>Super Admin Response</h1>
+              <p>Track the status of all your requests and complete approved ones.</p>
+            </div>
+
+            {/* ✅ Request to Admin button */}
+            <button
+              type="button"
+              className="mar-request-btn"
+              onClick={handleRequestToAdmin}
+            >
+              📩 Request to Admin
+            </button>
           </div>
 
           {/* STATS */}
@@ -367,4 +423,4 @@ const  MyRequests = () => {
   );
 };
 
-export default  MyRequests;
+export default MyRequests;

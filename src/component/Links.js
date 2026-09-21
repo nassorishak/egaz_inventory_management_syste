@@ -6,9 +6,9 @@ const Links = {
  ADMIN: [
   { label: 'AdminDashboard',              path: '/admin-dashboard',        icon: faChartBar },
   { label: 'Super Admin Response',   path: '/my-requests',            icon: faTasks },
-  { label: 'Request to Super Admin', path: '/admin-request-product',  icon: faUsers },
-  { label: 'Add Product',            path: '/add-product',            icon: faCog },
-  { label: 'Add Department',         path: '/add-department',         icon: faCog },
+  // { label: 'Request to Super Admin', path: '/admin-request-product',  icon: faUsers },
+  // { label: 'Add Product',            path: '/add-product',            icon: faCog },
+  // { label: 'Add Department',         path: '/add-department',         icon: faCog },
   { label: 'Manage Users',           path: '/users',                  icon: faCog },
   { label: 'View Product',           path: '/view-product',           icon: faCog },
   { label: 'Manage Requests',        path: '/manage-request',         icon: faCog },
@@ -24,7 +24,7 @@ const Links = {
 
   STAFF: [
     { label: 'StaffDashboard',        path: '/staff-dashboard',  icon: faChartBar },
-    { label: 'Request Product',  path: '/request-product',  icon: faCog },
+    // { label: 'Request Product',  path: '/request-product',  icon: faCog },
     { label: 'My Request',      path: '/my-request',       icon: faTasks },
     { label: 'Logout',           path: '/',                 icon: faSignOutAlt },
   ],
