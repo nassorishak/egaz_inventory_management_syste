@@ -223,6 +223,7 @@ import StaffDashboard         from './component/StaffDashboard';
 import ViewRequestedProducts  from './component/ViewRequestedProduct';
 import RequestProduct         from './component/staff/RequestProduct';
 import MyRequest              from './component/staff/MyRequest';
+import StaffContracts from './component/staff/StaffContracts';
 
 function App() {
   return (
@@ -255,6 +256,7 @@ function App() {
           <Route path="/requested-product"      element={<ViewRequestedProducts />} />
           <Route path="/requested-product1"     element={<RequestProduct />} />
 
+
           {/* Shared */}
           <Route path="/users"                  element={<User />} />
           <Route path="/view-product"           element={<ViewProduct />} />
@@ -263,6 +265,7 @@ function App() {
           <Route path="/staff-dashboard"   element={<StaffDashboard />} />
           <Route path="/request-product"   element={<RequestProduct />} />
           <Route path="/my-request"        element={<MyRequest />} />
+           <Route path="/staff-cotracts"        element={<StaffContracts />} />
         </Route>
 
         {/* ---------- FALLBACK ---------- */}

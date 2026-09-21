@@ -24,7 +24,7 @@ const Links = {
 
   STAFF: [
     { label: 'StaffDashboard',        path: '/staff-dashboard',  icon: faChartBar },
-    // { label: 'Request Product',  path: '/request-product',  icon: faCog },
+    { label: 'StaffContracts',  path: '/staff-cotracts',  icon: faCog },
     { label: 'My Request',      path: '/my-request',       icon: faTasks },
     { label: 'Logout',           path: '/',                 icon: faSignOutAlt },
   ],
