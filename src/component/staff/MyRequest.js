@@ -525,7 +525,7 @@ const SummaryCard = ({ label, value, color }) => (
 const page = {
   padding: '30px',
   background: '#f8fafc',
-  minHeight: '100vh',
+  minHeight: '80vh',
   fontFamily: 'Arial, Helvetica, sans-serif',
 };
 

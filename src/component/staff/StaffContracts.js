@@ -286,7 +286,7 @@ const StaffContracts = () => {
 };
 
 // ---------- styles ----------
-const page = { padding: 30, background: '#f8fafc', minHeight: '100vh', fontFamily: 'Arial, sans-serif' };
+const page = { padding: 30, background: '#f8fafc', minHeight: '80vh', fontFamily: 'Arial, sans-serif' };
 const header = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, gap: 16, flexWrap: 'wrap' };
 const title = { margin: 0, color: '#1e293b', fontSize: 28 };
 const subtitle = { marginTop: 6, color: '#64748b', fontSize: 14 };

@@ -258,7 +258,7 @@ function App() {
 
 
           {/* Shared */}
-          <Route path="/users"                  element={<User />} />
+          <Route path="/users"                  element={<User/>} />
           <Route path="/view-product"           element={<ViewProduct />} />
 
           {/* Staff */}
