@@ -317,7 +317,7 @@ const ViewAdminRequests = () => {
               {requests.map((r) => (
                 <tr key={r.id} style={styles.tr}>
                   <td style={styles.td}>
-                    {r.requestType === 'STOCK_REQUEST' ? '📦 Stock' : '📤 Give'}
+                    {r.requestType === 'STOCK_REQUEST' ? '📦 Stock' : '📤adminRequest'}
                   </td>
                   <td style={{ ...styles.td, fontWeight: 600, color: '#1e293b' }}>
                     {r.adminName}
@@ -347,7 +347,7 @@ const ViewAdminRequests = () => {
                       </button>
                     </div>
                     {r.status !== 'PENDING' && r.superAdminNote && (
-                      <div style={styles.noteText}>Note: {r.superAdminNote}</div>
+                      <div style={styles.noteText}>{r.superAdminNote}</div>
                     )}
                   </td>
                 </tr>
