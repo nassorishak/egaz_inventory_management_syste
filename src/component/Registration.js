@@ -986,6 +986,761 @@
 
 // export default Registration;
 
+// import React, { useState, useEffect } from 'react';
+// import { useNavigate, Link } from 'react-router-dom';
+// import axios from 'axios';
+
+// const Registration = () => {
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     email: '',
+//     password: '',
+//     gender: 'Male',
+//     phoneNumber: '',
+//     departmentId: '',
+//     role: '',
+//   });
+
+//   const [departments, setDepartments] = useState([]);
+//   const [error, setError] = useState('');
+//   const [success, setSuccess] = useState('');
+//   const [loading, setLoading] = useState(false);
+
+//   const navigate = useNavigate();
+
+//   // Fetch departments
+//   useEffect(() => {
+//     const fetchDepartments = async () => {
+//       try {
+//         const response = await axios.get(
+//           'http://localhost:8080/api/departments'
+//         );
+//         setDepartments(response.data);
+//       } catch (err) {
+//         console.error('Error fetching departments:', err);
+//         setError('Unable to load departments.');
+//       }
+//     };
+
+//     fetchDepartments();
+//   }, []);
+
+//   // Handle input changes
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData((prev) => ({
+//       ...prev,
+//       [name]: value,
+//     }));
+//   };
+
+//   // Submit registration
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setError('');
+//     setSuccess('');
+//     setLoading(true);
+
+//     const payload = {
+//       userName: formData.name.trim(),
+//       email: formData.email.trim(),
+//       password: formData.password,
+//       gender: formData.gender,
+//       phoneNumber: formData.phoneNumber.trim(),
+//       role: formData.role,
+//       department: {
+//         departmentId: Number(formData.departmentId),
+//       },
+//     };
+
+//     console.log('Registration Payload:', payload);
+
+//     try {
+//       const response = await axios.post(
+//         'http://localhost:8080/api/users/register',
+//         payload,
+//         {
+//           headers: {
+//             'Content-Type': 'application/json',
+//           },
+//         }
+//       );
+
+//       if (response.status === 200 || response.status === 201) {
+//         setSuccess(
+//           'Account created successfully! Redirecting to login...'
+//         );
+
+//         setTimeout(() => {
+//           navigate('/');
+//         }, 2000);
+//       }
+//     } catch (err) {
+//       console.error('Registration error:', err);
+
+//       if (err.response && err.response.data) {
+//         const data = err.response.data;
+
+//         if (typeof data === 'string') {
+//           setError(data);
+//         } else if (data.message) {
+//           setError(data.message);
+//         } else {
+//           setError(
+//             'Failed to create account. Please check your details.'
+//           );
+//         }
+//       } else {
+//         setError(
+//           'Cannot connect to server. Please ensure backend is running.'
+//         );
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <style>{`
+//         * {
+//           box-sizing: border-box;
+//         }
+
+//         body {
+//           margin: 0;
+//           font-family:
+//             -apple-system,
+//             BlinkMacSystemFont,
+//             "Segoe UI",
+//             Roboto,
+//             Arial,
+//             sans-serif;
+//         }
+
+//         .registration-container {
+//           min-height: 100vh;
+//           width: 100%;
+//           display: flex;
+//           justify-content: center;
+//           align-items: center;
+//           padding: 24px;
+//           position: relative;
+//           overflow: hidden;
+
+//           background:
+//             linear-gradient(
+//               135deg,
+//               #0f172a 0%,
+//               #1e3a8a 50%,
+//               #2563eb 100%
+//             );
+//         }
+
+//         /* Decorative circles */
+//         .registration-container::before {
+//           content: "";
+//           position: absolute;
+//           width: 380px;
+//           height: 380px;
+//           border-radius: 50%;
+//           background: rgba(255, 255, 255, 0.06);
+//           top: -150px;
+//           left: -120px;
+//         }
+
+//         .registration-container::after {
+//           content: "";
+//           position: absolute;
+//           width: 460px;
+//           height: 460px;
+//           border-radius: 50%;
+//           background: rgba(255, 255, 255, 0.05);
+//           bottom: -220px;
+//           right: -140px;
+//         }
+
+//         /* Main Card */
+//         .registration-card {
+//           width: 100%;
+//           max-width: 920px;
+//           position: relative;
+//           z-index: 2;
+//           display: flex;
+//           background: white;
+//           border-radius: 22px;
+//           overflow: hidden;
+//           box-shadow:
+//             0 25px 60px rgba(0, 0, 0, 0.28);
+//         }
+
+//         /* Left information panel */
+//         .registration-left {
+//           width: 42%;
+//           padding: 44px 36px;
+//           display: flex;
+//           flex-direction: column;
+//           justify-content: center;
+//           color: white;
+//           background:
+//             linear-gradient(
+//               160deg,
+//               #1e3a8a 0%,
+//               #1d4ed8 55%,
+//               #2563eb 100%
+//             );
+//         }
+
+//         .logo-container {
+//           width: 100%;
+//           display: flex;
+//           justify-content: center;
+//           align-items: center;
+//           margin-bottom: 22px;
+//         }
+
+//         .logo-image {
+//           width: 100%;
+//           max-width: 130px;
+//           height: 120px;
+//           object-fit: contain;
+//           padding: 16px;
+//           background: rgba(255, 255, 255, 0.08);
+//           border: 2px solid rgba(255, 255, 255, 0.25);
+//           border-radius: 60px;
+//           box-shadow:
+//             0 10px 25px rgba(0, 0, 0, 0.25),
+//             inset 0 1px 0 rgba(255, 255, 255, 0.15);
+//           backdrop-filter: blur(6px);
+//           -webkit-backdrop-filter: blur(6px);
+//         }
+
+//         .system-title {
+//           margin: 0 0 14px;
+//           font-size: 26px;
+//           line-height: 1.2;
+//           font-weight: 800;
+//           letter-spacing: 1px;
+//         }
+
+//         .left-description {
+//           max-width: 300px;
+//           margin: 0 0 24px;
+//           color: rgba(255, 255, 255, 0.82);
+//           font-size: 13px;
+//           line-height: 1.65;
+//         }
+
+//         .features {
+//           display: flex;
+//           flex-direction: column;
+//           gap: 13px;
+//         }
+
+//         .feature {
+//           display: flex;
+//           align-items: center;
+//           gap: 10px;
+//           font-size: 13px;
+//           color: rgba(255, 255, 255, 0.92);
+//         }
+
+//         .feature-icon {
+//           width: 21px;
+//           height: 21px;
+//           display: flex;
+//           align-items: center;
+//           justify-content: center;
+//           border-radius: 50%;
+//           background: rgba(255, 255, 255, 0.18);
+//           font-size: 12px;
+//           font-weight: bold;
+//           flex-shrink: 0;
+//         }
+
+//         /* Right Form */
+//         .registration-right {
+//           width: 58%;
+//           padding: 38px 42px;
+//           background: white;
+//           overflow-y: auto;
+//           max-height: 92vh;
+//         }
+
+//         .form-header {
+//           margin-bottom: 20px;
+//         }
+
+//         .form-title {
+//           margin: 0 0 6px;
+//           color: #111827;
+//           font-size: 26px;
+//           font-weight: 750;
+//         }
+
+//         .form-subtitle {
+//           margin: 0;
+//           color: #6b7280;
+//           font-size: 13px;
+//           line-height: 1.5;
+//         }
+
+//         /* Messages */
+//         .message {
+//           padding: 10px 13px;
+//           margin-bottom: 16px;
+//           border-radius: 9px;
+//           font-size: 12.5px;
+//           line-height: 1.5;
+//         }
+
+//         .error-message {
+//           color: #b91c1c;
+//           background: #fef2f2;
+//           border: 1px solid #fecaca;
+//         }
+
+//         .success-message {
+//           color: #166534;
+//           background: #f0fdf4;
+//           border: 1px solid #bbf7d0;
+//         }
+
+//         /* Form */
+//         .registration-form {
+//           width: 100%;
+//         }
+
+//         .input-group {
+//           margin-bottom: 14px;
+//         }
+
+//         .input-label {
+//           display: block;
+//           margin-bottom: 6px;
+//           color: #374151;
+//           font-size: 12.5px;
+//           font-weight: 650;
+//         }
+
+//         .input-wrapper {
+//           width: 100%;
+//           height: 42px;
+//           display: flex;
+//           align-items: center;
+//           border: 1px solid #d1d5db;
+//           border-radius: 9px;
+//           background: #f9fafb;
+//           transition: all 0.2s ease;
+//           overflow: hidden;
+//         }
+
+//         .input-wrapper:focus-within {
+//           border-color: #2563eb;
+//           background: white;
+//           box-shadow:
+//             0 0 0 3px rgba(37, 99, 235, 0.10);
+//         }
+
+//         .input-icon {
+//           width: 40px;
+//           display: flex;
+//           align-items: center;
+//           justify-content: center;
+//           color: #64748b;
+//           font-size: 15px;
+//           flex-shrink: 0;
+//         }
+
+//         .form-input {
+//           flex: 1;
+//           height: 100%;
+//           border: none;
+//           outline: none;
+//           background: transparent;
+//           padding: 0 12px 0 0;
+//           color: #111827;
+//           font-size: 12.5px;
+//         }
+
+//         .form-input::placeholder {
+//           color: #9ca3af;
+//         }
+
+//         /* Gender + Department + Role */
+//         .form-row {
+//           display: grid;
+//           grid-template-columns: 1fr 1fr;
+//           gap: 13px;
+//         }
+
+//         .form-row-full {
+//           display: grid;
+//           grid-template-columns: 1fr;
+//           gap: 13px;
+//         }
+
+//         .form-select {
+//           width: 100%;
+//           height: 42px;
+//           padding: 0 11px;
+//           border: 1px solid #d1d5db;
+//           border-radius: 9px;
+//           outline: none;
+//           background: #f9fafb;
+//           color: #374151;
+//           font-size: 12.5px;
+//           cursor: pointer;
+//         }
+
+//         .form-select:focus {
+//           border-color: #2563eb;
+//           background: white;
+//           box-shadow:
+//             0 0 0 3px rgba(37, 99, 235, 0.10);
+//         }
+
+//         /* Register Button */
+//         .register-button {
+//           width: 100%;
+//           height: 45px;
+//           margin-top: 4px;
+//           border: none;
+//           border-radius: 9px;
+//           background:
+//             linear-gradient(
+//               135deg,
+//               #1e40af 0%,
+//               #2563eb 100%
+//             );
+//           color: white;
+//           font-size: 13.5px;
+//           font-weight: 700;
+//           cursor: pointer;
+//           box-shadow:
+//             0 5px 12px rgba(30, 64, 175, 0.18);
+//           transition: all 0.2s ease;
+//         }
+
+//         .register-button:hover:not(:disabled) {
+//           transform: translateY(-2px);
+//           box-shadow:
+//             0 10px 20px rgba(30, 64, 175, 0.25);
+//         }
+
+//         .register-button:active:not(:disabled) {
+//           transform: translateY(0);
+//         }
+
+//         .register-button:disabled {
+//           opacity: 0.7;
+//           cursor: not-allowed;
+//         }
+
+//         /* Login section */
+//         .login-section {
+//           margin-top: 18px;
+//           padding-top: 16px;
+//           border-top: 1px solid #e5e7eb;
+//           text-align: center;
+//         }
+
+//         .login-text {
+//           margin: 0 0 6px;
+//           color: #6b7280;
+//           font-size: 11.5px;
+//         }
+
+//         .login-link {
+//           color: #1d4ed8;
+//           font-size: 12.5px;
+//           font-weight: 650;
+//           text-decoration: none;
+//         }
+
+//         .login-link:hover {
+//           text-decoration: underline;
+//         }
+
+//         /* Responsive Design */
+//         @media (max-width: 900px) {
+//           .registration-card {
+//             max-width: 600px;
+//           }
+
+//           .registration-left {
+//             display: none;
+//           }
+
+//           .registration-right {
+//             width: 100%;
+//             padding: 38px 44px;
+//           }
+//         }
+
+//         @media (max-width: 600px) {
+//           .registration-container {
+//             padding: 16px 12px;
+//           }
+
+//           .registration-card {
+//             border-radius: 16px;
+//           }
+
+//           .registration-right {
+//             padding: 30px 22px;
+//             max-height: none;
+//           }
+
+//           .form-title {
+//             font-size: 23px;
+//           }
+
+//           .form-row {
+//             grid-template-columns: 1fr;
+//             gap: 0;
+//           }
+
+//           .input-group {
+//             margin-bottom: 13px;
+//           }
+//         }
+
+//         @media (max-width: 400px) {
+//           .registration-right {
+//             padding: 24px 16px;
+//           }
+
+//           .form-title {
+//             font-size: 21px;
+//           }
+//         }
+//       `}</style>
+
+//       <div className="registration-container">
+//         <div className="registration-card">
+//           {/* LEFT SIDE */}
+//           <div className="registration-left">
+//             <div className="logo-container">
+//               <img
+//                 src="/egaz.jpg"
+//                 alt="System Logo"
+//                 className="logo-image"
+//                 onError={(e) => {
+//                   e.target.style.display = 'none';
+//                 }}
+//               />
+//             </div>
+
+//             <h1 className="system-title">
+//               INVENTORY
+//               <br />
+//               MANAGEMENT
+//               <br />
+//               SYSTEM
+//             </h1>
+
+//             <p className="left-description">
+//               Create your account and join the Inventory
+//               Management System. Manage your work efficiently
+//               from one secure platform.
+//             </p>
+
+//             <div className="features">
+//               <div className="feature">
+//                 <span className="feature-icon">✓</span>
+//                 <span>Easy inventory management</span>
+//               </div>
+
+//               <div className="feature">
+//                 <span className="feature-icon">✓</span>
+//                 <span>Secure staff access</span>
+//               </div>
+
+//               <div className="feature">
+//                 <span className="feature-icon">✓</span>
+//                 <span>Organized departments</span>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* RIGHT SIDE */}
+//           <div className="registration-right">
+//             <div className="form-header">
+//               <h1 className="form-title">Create Account</h1>
+//               <p className="form-subtitle">
+//                 Fill in your details below to create your account
+//               </p>
+//             </div>
+
+//             {/* Error */}
+//             {error && (
+//               <div className="message error-message">
+//                 ⚠️ {error}
+//               </div>
+//             )}
+
+//             {/* Success */}
+//             {success && (
+//               <div className="message success-message">
+//                 ✓ {success}
+//               </div>
+//             )}
+
+//             <form onSubmit={handleSubmit} className="registration-form">
+//               {/* Full Name */}
+//               <div className="input-group">
+//                 <label className="input-label">Full Name</label>
+//                 <div className="input-wrapper">
+//                   <span className="input-icon">👤</span>
+//                   <input
+//                     type="text"
+//                     name="name"
+//                     value={formData.name}
+//                     onChange={handleChange}
+//                     placeholder="Enter your full name"
+//                     required
+//                     className="form-input"
+//                   />
+//                 </div>
+//               </div>
+
+//               {/* Email */}
+//               <div className="input-group">
+//                 <label className="input-label">Email Address</label>
+//                 <div className="input-wrapper">
+//                   <span className="input-icon">✉</span>
+//                   <input
+//                     type="email"
+//                     name="email"
+//                     value={formData.email}
+//                     onChange={handleChange}
+//                     placeholder="Enter your email"
+//                     required
+//                     className="form-input"
+//                   />
+//                 </div>
+//               </div>
+
+//               {/* Password */}
+//               <div className="input-group">
+//                 <label className="input-label">Password</label>
+//                 <div className="input-wrapper">
+//                   <span className="input-icon">🔒</span>
+//                   <input
+//                     type="password"
+//                     name="password"
+//                     value={formData.password}
+//                     onChange={handleChange}
+//                     placeholder="Create a password"
+//                     required
+//                     className="form-input"
+//                   />
+//                 </div>
+//               </div>
+
+//               {/* Gender + Department */}
+//               <div className="form-row">
+//                 <div className="input-group">
+//                   <label className="input-label">Gender</label>
+//                   <select
+//                     name="gender"
+//                     value={formData.gender}
+//                     onChange={handleChange}
+//                     className="form-select"
+//                   >
+//                     <option value="Male">Male</option>
+//                     <option value="Female">Female</option>
+//                     <option value="Other">Other</option>
+//                   </select>
+//                 </div>
+
+//                 <div className="input-group">
+//                   <label className="input-label">Department</label>
+//                   <select
+//                     name="departmentId"
+//                     value={formData.departmentId}
+//                     onChange={handleChange}
+//                     required
+//                     className="form-select"
+//                   >
+//                     {departments.length > 0 ? (
+//                       departments.map((dept) => (
+//                         <option
+//                           key={dept.departmentId}
+//                           value={dept.departmentId}
+//                         >
+//                           {dept.departmentName}
+//                         </option>
+//                       ))
+//                     ) : (
+//                       <option value="">Loading departments...</option>
+//                     )}
+//                   </select>
+//                 </div>
+//               </div>
+
+//               {/* Phone */}
+//               <div className="input-group">
+//                 <label className="input-label">Phone Number</label>
+//                 <div className="input-wrapper">
+//                   <span className="input-icon">📞</span>
+//                   <input
+//                     type="tel"
+//                     name="phoneNumber"
+//                     value={formData.phoneNumber}
+//                     onChange={handleChange}
+//                     placeholder="Enter your phone number"
+//                     required
+//                     className="form-input"
+//                   />
+//                 </div>
+//               </div>
+
+//               {/* Role */}
+//               <div className="input-group">
+//                 <label className="input-label">Role</label>
+//                 <select
+//                   name="role"
+//                   value={formData.role}
+//                   onChange={handleChange}
+//                   required
+//                   className="form-select"
+//                 >
+//                   <option value="SupperAdmin">SupperAdmin</option>
+//                   <option value="Admin">Admin</option>
+//                   <option value="Staff">Staff</option>
+//                 </select>
+//               </div>
+
+//               {/* Register */}
+//               <button
+//                 type="submit"
+//                 disabled={loading}
+//                 className="register-button"
+//               >
+//                 {loading ? 'Creating Account...' : 'Create Account →'}
+//               </button>
+//             </form>
+
+//             {/* Login */}
+//             <div className="login-section">
+//               <p className="login-text">
+//                 Already have an account?
+//               </p>
+//               <Link to="/" className="login-link">
+//                 ← Back to Login
+//               </Link>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Registration;
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -1041,6 +1796,7 @@ const Registration = () => {
     setSuccess('');
     setLoading(true);
 
+    // ✅ FIX: send `department` as a plain number (matches DB int column)
     const payload = {
       userName: formData.name.trim(),
       email: formData.email.trim(),
@@ -1048,12 +1804,11 @@ const Registration = () => {
       gender: formData.gender,
       phoneNumber: formData.phoneNumber.trim(),
       role: formData.role,
-      department: {
-        departmentId: Number(formData.departmentId),
-      },
+      department: Number(formData.departmentId),
     };
 
-    console.log('Registration Payload:', payload);
+    // ✅ Show FULL payload without truncation
+    console.log('Registration Payload:', JSON.stringify(payload, null, 2));
 
     try {
       const response = await axios.post(
@@ -1077,6 +1832,8 @@ const Registration = () => {
       }
     } catch (err) {
       console.error('Registration error:', err);
+      console.error('Backend response:', err.response?.data);
+      console.error('Status:', err.response?.status);
 
       if (err.response && err.response.data) {
         const data = err.response.data;
@@ -1664,6 +2421,7 @@ const Registration = () => {
                     required
                     className="form-select"
                   >
+                    <option value="">-- Select Department --</option>
                     {departments.length > 0 ? (
                       departments.map((dept) => (
                         <option
@@ -1707,7 +2465,8 @@ const Registration = () => {
                   required
                   className="form-select"
                 >
-                  <option value="SupperAdmin">SupperAdmin</option>
+                  <option value="">-- Select Role --</option>
+                  <option value="SuperAdmin">SuperAdmin</option>
                   <option value="Admin">Admin</option>
                   <option value="Staff">Staff</option>
                 </select>

@@ -755,6 +755,14 @@ const Login = () => {
                 </>
               )}
             </button>
+            <div style={{ textAlign: 'right', marginBottom: 12 }}>
+  <Link
+    to="/forgot-password"
+    style={{ color: '#2563eb', fontSize: 13, marginRight:'150px', marginTop:'200px', textDecoration: 'none' }}
+  >
+    Forgot password?
+  </Link>
+</div>
           </form>
 
           <div style={styles.divider}>

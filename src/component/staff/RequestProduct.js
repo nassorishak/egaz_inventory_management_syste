@@ -763,7 +763,8 @@ const RequestProduct = () => {
                   <option value="">-- Select a product --</option>
                   {products.map((p) => (
                     <option key={p.productId} value={p.productId}>
-                      {p.productName} (in stock: {p.productQuantity})
+                      {p.productName}
+                      {/* {p.productName} (in store: {p.productQuantity}) */}
                     </option>
                   ))}
                 </select>
@@ -828,7 +829,7 @@ const RequestProduct = () => {
 
               {/* ISSUE DATE */}
               <div className="form-group">
-                <label htmlFor="issueDate">Issue Date <span className="required">*</span></label>
+                <label htmlFor="issueDate">Date <span className="required">*</span></label>
                 <input
                   id="issueDate"
                   type="date"
