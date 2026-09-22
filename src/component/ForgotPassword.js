@@ -6,12 +6,14 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [devLink, setDevLink] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     setError('');
+    setDevLink('');
     setLoading(true);
 
     try {
@@ -20,14 +22,14 @@ const ForgotPassword = () => {
         { email: email.trim() }
       );
 
-      setMessage(res.data.message || 'Reset link sent to your email.');
+      setMessage(res.data.message || 'Reset link generated.');
 
-      // ⚠️ DEV ONLY — log the reset link for easy testing
+      // ✅ Weka link kwenye state ili ionekane kwenye page
       if (res.data.resetLink) {
-        console.log('🔗 Reset link:', res.data.resetLink);
+        setDevLink(res.data.resetLink);
       }
     } catch (err) {
-      setError(err.response?.data || 'Something went wrong. Please try again.');
+      setError(err.response?.data || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -47,12 +49,12 @@ const ForgotPassword = () => {
         borderRadius: 16,
         padding: 32,
         width: '100%',
-        maxWidth: 420,
+        maxWidth: 460,
         boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
       }}>
         <h2 style={{ marginTop: 0, color: '#111827' }}>Forgot Password?</h2>
         <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 20 }}>
-          Enter your email and we'll send you a reset link.
+          Enter your email to generate a reset link.
         </p>
 
         {message && (
@@ -72,12 +74,6 @@ const ForgotPassword = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          <label style={{
-            display: 'block', marginBottom: 6,
-            fontSize: 13, fontWeight: 600, color: '#374151'
-          }}>
-            Email Address
-          </label>
           <input
             type="email"
             value={email}
@@ -90,7 +86,6 @@ const ForgotPassword = () => {
               fontSize: 14, marginBottom: 16, outline: 'none'
             }}
           />
-
           <button
             type="submit"
             disabled={loading}
@@ -102,9 +97,36 @@ const ForgotPassword = () => {
               opacity: loading ? 0.7 : 1
             }}
           >
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? 'Generating...' : 'Get Reset Link'}
           </button>
         </form>
+
+        {/* ✅ Link inaonekana hapa */}
+        {devLink && (
+          <div style={{
+            background: '#f3f4f6',
+            border: '1px dashed #9ca3af',
+            padding: 14,
+            borderRadius: 8,
+            marginTop: 18,
+            fontSize: 12,
+            wordBreak: 'break-all'
+          }}>
+            <div style={{ marginBottom: 8, color: '#374151', fontWeight: 700 }}>
+              🔗 DEV Reset Link (click to reset):
+            </div>
+            <Link
+              to={`/reset-password?token=${devLink.split('token=')[1]}`}
+              style={{
+                color: '#2563eb',
+                textDecoration: 'underline',
+                fontSize: 13
+              }}
+            >
+              → Go to Reset Password Page
+            </Link>
+          </div>
+        )}
 
         <div style={{ textAlign: 'center', marginTop: 16, fontSize: 13 }}>
           <Link to="/" style={{ color: '#2563eb', textDecoration: 'none' }}>
