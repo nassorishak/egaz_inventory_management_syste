@@ -12,6 +12,7 @@ const Links = {
   { label: 'Manage Users',           path: '/users',                  icon: faCog },
   { label: 'View Product',           path: '/view-product',           icon: faCog },
   { label: 'Manage Requests',        path: '/manage-request',         icon: faCog },
+   { label: 'productReport',        path: '/product-report',         icon: faCog },
   { label: 'Logout',                 path: '/',                       icon: faSignOutAlt },
 ],
   SUPPER_ADMIN: [

@@ -120,6 +120,7 @@ import ViewRequestedProducts  from './component/ViewRequestedProduct';
 import RequestProduct         from './component/staff/RequestProduct';
 import MyRequest              from './component/staff/MyRequest';
 import StaffContracts         from './component/staff/StaffContracts';
+import ProductReport from './component/admin/ProductReport';
 
 function App() {
   return (
@@ -151,6 +152,7 @@ function App() {
           <Route path="/admin-request-product"  element={<AdminRequestProduct />} />
           <Route path="/my-requests"            element={<MyRequests />} />
           <Route path="/add-product"            element={<AddProduct />} />
+          <Route path="/product-report"            element={<ProductReport />} />
           <Route path="/add-department"         element={<AddDepartment />} />
           <Route path="/manage-request"         element={<ManageRequests />} />
           <Route path="/requested-product"      element={<ViewRequestedProducts />} />

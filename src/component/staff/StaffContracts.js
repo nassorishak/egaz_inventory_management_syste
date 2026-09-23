@@ -207,7 +207,7 @@ const StaffContracts = () => {
               <div>
                 <h3 style={{ margin: 0, color: '#1e293b' }}>Product Contract</h3>
                 <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: 13 }}>
-                  {activeRequest.productName} × {activeRequest.quantity}
+                  {activeRequest.productName}{}
                 </p>
               </div>
               <button style={closeBtn} onClick={closeForm}>×</button>
@@ -227,7 +227,7 @@ const StaffContracts = () => {
                 </div>
 
                 <div style={field}>
-                  <label style={label}>Start Date *</label>
+                  <label style={label}>Date *</label>
                   <input
                     type="date"
                     name="startDate"
