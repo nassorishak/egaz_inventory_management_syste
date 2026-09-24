@@ -1,5 +1,4 @@
-
-
+// // export default SuperAdminDashboard;
 // import React, { useState, useEffect, useMemo } from 'react';
 // import jsPDF from 'jspdf';
 // import autoTable from 'jspdf-autotable';
@@ -14,26 +13,19 @@
 
 // // ================================================================
 // // ========== PRODUCT INVENTORY & REQUEST REPORT ==================
-// // ==========  (Super Admin ONLY)  ================================
+// // ==  (Super Admin ONLY — summary + PDF export, no tables on screen)
 // // ================================================================
 // const ProductInventoryReport = () => {
 //   const [products, setProducts] = useState([]);
 //   const [requests, setRequests] = useState([]);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState('');
-//   const [showDepartmentUsage, setShowDepartmentUsage] = useState(false);
 //   const [departmentUsage, setDepartmentUsage] = useState({});
-//   const [expandedDept, setExpandedDept] = useState(null);
 
-//   const [search, setSearch] = useState('');
-//   const [statusFilter, setStatusFilter] = useState('ALL');
-//   const [stockFilter, setStockFilter] = useState('ALL');
-//   const [deptFilter, setDeptFilter] = useState('ALL');
+//   // Period filter
 //   const [yearFilter, setYearFilter] = useState(String(new Date().getFullYear()));
 //   const [quarterFilter, setQuarterFilter] = useState('ALL');
 
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [pageSize, setPageSize] = useState(10);
 //   const [lastUpdated, setLastUpdated] = useState(null);
 //   const [autoRefresh, setAutoRefresh] = useState(true);
 
@@ -118,7 +110,6 @@
 //   };
 //   const getFilterDate = (item) => item.receiptDate || item.issueDate || null;
 
-//   // Current year + previous 5
 //   const years = useMemo(() => {
 //     const currentYear = new Date().getFullYear();
 //     return Array.from({ length: 6 }, (_, i) => currentYear - i);
@@ -140,27 +131,7 @@
 //   const inStockCount = periodProducts.filter(p => p.stockStatus === 'In Stock').length;
 //   const outStockCount = periodProducts.filter(p => p.stockStatus === 'Out of Stock').length;
 
-//   const departments = useMemo(() => {
-//     const set = new Set(periodProducts.map(p => p.departmentName).filter(Boolean));
-//     return Array.from(set).sort();
-//   }, [periodProducts]);
-
-//   const filteredProducts = useMemo(() => {
-//     return periodProducts.filter(p => {
-//       const searchMatch =
-//         !search ||
-//         (p.productName || '').toLowerCase().includes(search.toLowerCase()) ||
-//         (p.productDescription || '').toLowerCase().includes(search.toLowerCase()) ||
-//         (p.departmentName || '').toLowerCase().includes(search.toLowerCase());
-
-//       const statusMatch = statusFilter === 'ALL' || p.status === statusFilter;
-//       const stockMatch = stockFilter === 'ALL' || p.stockStatus === stockFilter;
-//       const deptMatch = deptFilter === 'ALL' || p.departmentName === deptFilter;
-
-//       return searchMatch && statusMatch && stockMatch && deptMatch;
-//     });
-//   }, [periodProducts, search, statusFilter, stockFilter, deptFilter]);
-
+//   // Build department usage (for PDF only — not shown on screen)
 //   useEffect(() => {
 //     const deptDetails = {};
 //     requests.forEach(req => {
@@ -187,16 +158,7 @@
 //     setDepartmentUsage(deptDetails);
 //   }, [requests, products, yearFilter, quarterFilter]);
 
-//   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
-//   useEffect(() => {
-//     if (currentPage > totalPages) setCurrentPage(1);
-//   }, [totalPages, currentPage]);
-
-//   const paginatedProducts = useMemo(() => {
-//     const start = (currentPage - 1) * pageSize;
-//     return filteredProducts.slice(start, start + pageSize);
-//   }, [filteredProducts, currentPage, pageSize]);
-
+//   // ============ PDF EXPORT ============
 //   const exportToPDF = () => {
 //     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
 //     const pageWidth = doc.internal.pageSize.getWidth();
@@ -223,18 +185,7 @@
 //     doc.text(`Report Period: ${periodText}`, marginLeft, 70);
 //     doc.setFont('helvetica', 'normal');
 
-//     const filterSummary = [];
-//     if (search) filterSummary.push(`Search: "${search}"`);
-//     if (statusFilter !== 'ALL') filterSummary.push(`Admin Status: ${statusFilter}`);
-//     if (stockFilter !== 'ALL') filterSummary.push(`Stock: ${stockFilter}`);
-//     if (deptFilter !== 'ALL') filterSummary.push(`Department: ${deptFilter}`);
-
 //     let y = 84;
-//     if (filterSummary.length > 0) {
-//       doc.setTextColor(100);
-//       doc.text(`Filters: ${filterSummary.join('  |  ')}`, marginLeft, y);
-//       y += 12;
-//     }
 
 //     const cardY = y + 4;
 //     const cardHeight = 34;
@@ -268,11 +219,12 @@
 //     doc.text('Total Rows', marginLeft + (cardWidth + cardGap) * 2 + 10, cardY + 14);
 //     doc.setFontSize(14);
 //     doc.setFont('helvetica', 'bold');
-//     doc.text(String(filteredProducts.length), marginLeft + (cardWidth + cardGap) * 2 + 10, cardY + 28);
+//     doc.text(String(periodProducts.length), marginLeft + (cardWidth + cardGap) * 2 + 10, cardY + 28);
 //     doc.setFont('helvetica', 'normal');
 
 //     y = cardY + cardHeight + 20;
 
+//     // Department-wise Usage (PDF only)
 //     const deptKeys = Object.keys(departmentUsage);
 //     if (deptKeys.length > 0) {
 //       doc.setFontSize(12);
@@ -339,6 +291,7 @@
 //       y = doc.lastAutoTable.finalY + 24;
 //     }
 
+//     // Product Details (PDF only)
 //     doc.setFontSize(12);
 //     doc.setTextColor(30, 64, 175);
 //     doc.setFont('helvetica', 'bold');
@@ -355,7 +308,7 @@
 //         'Receipt Date', 'Issue Date', 'Staff Description', 'Admin Note',
 //         'Admin Status', 'Stock Status'
 //       ]],
-//       body: filteredProducts.map(p => [
+//       body: periodProducts.map(p => [
 //         p.productName ?? '-',
 //         p.productDescription ?? '-',
 //         { content: p.quantity ?? '-', styles: { halign: 'center' } },
@@ -418,33 +371,13 @@
 //     doc.save(`Product_Report_${periodTag}_${new Date().toISOString().slice(0, 10)}.pdf`);
 //   };
 
-//   const toggleDept = (dept) => setExpandedDept(expandedDept === dept ? null : dept);
-
-//   const badgeStyle = (status) => {
-//     const map = {
-//       APPROVED: { bg: '#dcfce7', color: '#166534' },
-//       REJECTED: { bg: '#fee2e2', color: '#b91c1c' },
-//       PENDING: { bg: '#fef3c7', color: '#92400e' },
-//       AVAILABLE: { bg: '#dbeafe', color: '#1e40af' },
-//     };
-//     const c = map[status] || { bg: '#e2e8f0', color: '#334155' };
-//     return { padding: '3px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', backgroundColor: c.bg, color: c.color };
-//   };
-
 //   return (
 //     <div>
 //       {/* Top bar */}
 //       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
 //         <button
-//           style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-//           onClick={() => setShowDepartmentUsage(!showDepartmentUsage)}
-//         >
-//           {showDepartmentUsage ? 'Hide' : 'Show'} Department Usage
-//         </button>
-
-//         <button
 //           onClick={exportToPDF}
-//           style={{ padding: '8px 16px', backgroundColor: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+//           style={{ padding: '8px 16px', backgroundColor: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}
 //         >
 //           Export to PDF
 //         </button>
@@ -464,11 +397,11 @@
 //       {/* Period filter */}
 //       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '12px', padding: '12px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
 //         <strong style={{ fontSize: '13px', color: '#1e40af', alignSelf: 'center' }}>Report Period:</strong>
-//         <select value={yearFilter} onChange={(e) => { setYearFilter(e.target.value); setCurrentPage(1); }} style={selectStyle}>
+//         <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} style={selectStyle}>
 //           <option value="ALL">All Years</option>
 //           {years.map(y => <option key={y} value={y}>{y}</option>)}
 //         </select>
-//         <select value={quarterFilter} onChange={(e) => { setQuarterFilter(e.target.value); setCurrentPage(1); }} style={selectStyle}>
+//         <select value={quarterFilter} onChange={(e) => setQuarterFilter(e.target.value)} style={selectStyle}>
 //           <option value="ALL">All Quarters</option>
 //           <option value="1">Q1 (Jan – Mar)</option>
 //           <option value="2">Q2 (Apr – Jun)</option>
@@ -476,174 +409,37 @@
 //           <option value="4">Q4 (Oct – Dec)</option>
 //         </select>
 //         <button
-//           onClick={() => { setYearFilter(String(new Date().getFullYear())); setQuarterFilter('ALL'); setCurrentPage(1); }}
+//           onClick={() => { setYearFilter(String(new Date().getFullYear())); setQuarterFilter('ALL'); }}
 //           style={{ padding: '8px 14px', backgroundColor: '#dbeafe', color: '#1e40af', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
 //         >
 //           This Year
 //         </button>
 //       </div>
 
-//       {/* Department usage panel */}
-//       {showDepartmentUsage && (
-//         <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: '#f0f4f8', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-//           <h3 style={{ marginTop: 0 }}>Department-wise Usage (Approved / Rejected)</h3>
-//           {Object.keys(departmentUsage).length === 0 ? (
-//             <p style={{ color: '#64748b' }}>No approved or rejected requests for this period.</p>
-//           ) : (
-//             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-//               {Object.keys(departmentUsage).map((dept) => {
-//                 const items = departmentUsage[dept];
-//                 const isOpen = expandedDept === dept;
-//                 const approvedCount = items.filter(i => i.status === 'APPROVED').length;
-//                 const rejectedCount = items.filter(i => i.status === 'REJECTED').length;
-//                 return (
-//                   <div key={dept} style={{ backgroundColor: '#fff', borderRadius: '6px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-//                     <div onClick={() => toggleDept(dept)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', cursor: 'pointer', backgroundColor: isOpen ? '#e0e7ff' : '#f8fafc' }}>
-//                       <span style={{ fontWeight: '600', color: '#1e293b' }}>{dept}</span>
-//                       <span style={{ fontSize: '13px', color: '#64748b' }}>
-//                         {items.length} request{items.length !== 1 ? 's' : ''}
-//                         <span style={{ marginLeft: '10px', color: '#166534', fontWeight: 600 }}> {approvedCount}</span>
-//                         <span style={{ marginLeft: '8px', color: '#b91c1c', fontWeight: 600 }}> {rejectedCount}</span>
-//                         <span style={{ marginLeft: '10px' }}>{isOpen ? '▲' : '▼'}</span>
-//                       </span>
-//                     </div>
-//                     {isOpen && (
-//                       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-//                         <thead>
-//                           <tr>
-//                             <th style={deptThStyle}>Product Name</th>
-//                             <th style={deptThStyle}>Quantity</th>
-//                             <th style={deptThStyle}>Status</th>
-//                           </tr>
-//                         </thead>
-//                         <tbody>
-//                           {items.map((item, i) => (
-//                             <tr key={i} style={{ borderTop: '1px solid #f1f5f9' }}>
-//                               <td style={deptTdStyle}>{item.productName}</td>
-//                               <td style={{ ...deptTdStyle, fontWeight: '600' }}>{item.qty}</td>
-//                               <td style={deptTdStyle}><span style={badgeStyle(item.status)}>{item.status}</span></td>
-//                             </tr>
-//                           ))}
-//                         </tbody>
-//                       </table>
-//                     )}
-//                   </div>
-//                 );
-//               })}
-//             </div>
-//           )}
+//       {/* Summary cards only */}
+//       {loading ? (
+//         <p>Loading...</p>
+//       ) : error ? (
+//         <p style={{ color: 'red' }}>{error}</p>
+//       ) : (
+//         <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+//           <div style={{ flex: 1, padding: '20px', backgroundColor: '#dcfce7', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '140px' }}>
+//             <h3 style={{ margin: 0, color: '#166534' }}>In Stock</h3>
+//             <p style={{ fontSize: '24px', margin: '10px 0', color: '#166534' }}>{inStockCount}</p>
+//           </div>
+//           <div style={{ flex: 1, padding: '20px', backgroundColor: '#fee2e2', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '140px' }}>
+//             <h3 style={{ margin: 0, color: '#b91c1c' }}>Out of Stock</h3>
+//             <p style={{ fontSize: '24px', margin: '10px 0', color: '#b91c1c' }}>{outStockCount}</p>
+//           </div>
+//           <div style={{ flex: 1, padding: '20px', backgroundColor: '#dbeafe', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '140px' }}>
+//             <h3 style={{ margin: 0, color: '#1e40af' }}>Total Rows</h3>
+//             <p style={{ fontSize: '24px', margin: '10px 0', color: '#1e40af' }}>{periodProducts.length}</p>
+//           </div>
 //         </div>
 //       )}
 
-//       {/* Stock cards */}
-//       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-//         <div style={{ flex: 1, padding: '20px', backgroundColor: '#dcfce7', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '140px' }}>
-//           <h3 style={{ margin: 0, color: '#166534' }}>In Stock</h3>
-//           <p style={{ fontSize: '24px', margin: '10px 0', color: '#166534' }}>{inStockCount}</p>
-//         </div>
-//         <div style={{ flex: 1, padding: '20px', backgroundColor: '#fee2e2', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '140px' }}>
-//           <h3 style={{ margin: 0, color: '#b91c1c' }}>Out of Stock</h3>
-//           <p style={{ fontSize: '24px', margin: '10px 0', color: '#b91c1c' }}>{outStockCount}</p>
-//         </div>
-//       </div>
-
-//       {/* Filter bar */}
-//       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px', padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-//         <input
-//           type="text"
-//           placeholder="Search product / description / department..."
-//           value={search}
-//           onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-//           style={{ flex: '1 1 240px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }}
-//         />
-//         <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }} style={selectStyle}>
-//           <option value="ALL">All Admin Status</option>
-//           <option value="APPROVED">APPROVED</option>
-//           <option value="REJECTED">REJECTED</option>
-//           <option value="PENDING">PENDING</option>
-//           <option value="AVAILABLE">AVAILABLE</option>
-//         </select>
-//         <select value={stockFilter} onChange={(e) => { setStockFilter(e.target.value); setCurrentPage(1); }} style={selectStyle}>
-//           <option value="ALL">All Stock Status</option>
-//           <option value="In Stock">In Stock</option>
-//           <option value="Out of Stock">Out of Stock</option>
-//         </select>
-//         <select value={deptFilter} onChange={(e) => { setDeptFilter(e.target.value); setCurrentPage(1); }} style={selectStyle}>
-//           <option value="ALL">All Departments</option>
-//           {departments.map(d => <option key={d} value={d}>{d}</option>)}
-//         </select>
-//         <button
-//           onClick={() => { setSearch(''); setStatusFilter('ALL'); setStockFilter('ALL'); setDeptFilter('ALL'); setCurrentPage(1); }}
-//           style={{ padding: '8px 14px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
-//         >
-//           Clear
-//         </button>
-//       </div>
-
-//       {/* Table */}
-//       {loading ? <p>Loading...</p> : error ? <p style={{ color: 'red' }}>{error}</p> : (
-//         <>
-//           <div style={{ overflowX: 'auto' }}>
-//             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1200px' }}>
-//               <thead>
-//                 <tr>
-//                   <th style={headerStyle}>Product Name</th>
-//                   <th style={headerStyle}>Product Description</th>
-//                   <th style={headerStyle}>Quantity</th>
-//                   <th style={headerStyle}>Department</th>
-//                   <th style={headerStyle}>Price</th>
-//                   <th style={headerStyle}>Receipt Date</th>
-//                   <th style={headerStyle}>Issue Date</th>
-//                   <th style={headerStyle}>Staff Description</th>
-//                   <th style={headerStyle}>Admin Note</th>
-//                   <th style={headerStyle}>Admin Status</th>
-//                   <th style={headerStyle}>Stock Status</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {paginatedProducts.length === 0 ? (
-//                   <tr><td colSpan="11" style={{ padding: '20px', textAlign: 'center' }}>No products match your filters.</td></tr>
-//                 ) : (
-//                   paginatedProducts.map((p) => (
-//                     <tr key={p.productId} style={{ borderBottom: '1px solid #e2e8f0' }}>
-//                       <td style={cellStyle}>{p.productName || '-'}</td>
-//                       <td style={cellStyle}>{p.productDescription ?? '-'}</td>
-//                       <td style={cellStyle}>{p.quantity ?? '-'}</td>
-//                       <td style={cellStyle}>{p.departmentName}</td>
-//                       <td style={cellStyle}>{p.price != null ? Number(p.price).toLocaleString() : '-'}</td>
-//                       <td style={cellStyle}>{p.receiptDate ?? '-'}</td>
-//                       <td style={cellStyle}>{p.issueDate ?? '-'}</td>
-//                       <td style={cellStyle}>{p.description ?? '-'}</td>
-//                       <td style={cellStyle}>{p.adminNote ?? '-'}</td>
-//                       <td style={cellStyle}><span style={badgeStyle(p.status)}>{p.status ?? 'AVAILABLE'}</span></td>
-//                       <td style={{ ...cellStyle, fontWeight: 'bold', color: p.stockStatus === 'In Stock' ? '#166534' : '#b91c1c' }}>{p.stockStatus}</td>
-//                     </tr>
-//                   ))
-//                 )}
-//               </tbody>
-//             </table>
-//           </div>
-
-//           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginTop: '15px', fontSize: '13px', color: '#475569' }}>
-//             <div>
-//               Showing <strong>{filteredProducts.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}</strong> – <strong>{Math.min(currentPage * pageSize, filteredProducts.length)}</strong> of <strong>{filteredProducts.length}</strong> results
-//             </div>
-//             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-//               <label>Rows:
-//                 <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }} style={{ marginLeft: '6px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1' }}>
-//                   <option value={5}>5</option>
-//                   <option value={10}>10</option>
-//                   <option value={25}>25</option>
-//                   <option value={50}>50</option>
-//                 </select>
-//               </label>
-//               <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} style={pageBtnStyle(currentPage === 1)}>Prev</button>
-//               <span>Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong></span>
-//               <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} style={pageBtnStyle(currentPage === totalPages)}>Next</button>
-//             </div>
-//           </div>
-//         </>
-//       )}
+//       {/* ❌ No department usage table and no product table on screen for Super Admin.
+//           Both tables are included in the exported PDF. */}
 //     </div>
 //   );
 // };
@@ -789,7 +585,6 @@
 //     }
 //   };
 
-//   // ============ DASHBOARD CARDS ============
 //   const cards = [
 //     {
 //       title: 'All Products Report',
@@ -805,11 +600,10 @@
 //       color: '#8b5cf6',
 //       actions: [{ label: 'Download Users Report', type: 'report', kind: 'users' }],
 //     },
-//     // ===== SUPER ADMIN ONLY =====
 //     {
 //       title: 'Product Inventory & Request Report',
 //       icon: '📊',
-//       description: 'View stock status, department usage, and export a full PDF report.',
+//       description: 'Pick a period and export the full inventory PDF report.',
 //       color: '#0ea5e9',
 //       actions: [{ label: 'Open Inventory Report', type: 'inventory' }],
 //     },
@@ -886,7 +680,7 @@
 //         ))}
 //       </div>
 
-//       {/* ============ EMBEDDED INVENTORY REPORT (SUPER ADMIN ONLY) ============ */}
+//       {/* ============ EMBEDDED INVENTORY REPORT (SUMMARY + PDF ONLY) ============ */}
 //       {showInventoryReport && (
 //         <div style={{ marginTop: '40px', paddingTop: '30px', borderTop: '2px solid #e2e8f0' }}>
 //           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -962,18 +756,9 @@
 // };
 
 // // Shared styles
-// const headerStyle = { padding: '10px', backgroundColor: '#1e40af', color: '#fff', textAlign: 'left', fontSize: '13px' };
-// const cellStyle = { padding: '10px', fontSize: '13px' };
 // const selectStyle = { padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', backgroundColor: '#fff', cursor: 'pointer' };
-// const deptThStyle = { padding: '8px 16px', textAlign: 'left', fontSize: '12px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' };
-// const deptTdStyle = { padding: '10px 16px', fontSize: '13px', color: '#1e293b' };
-// const pageBtnStyle = (disabled) => ({
-//   padding: '6px 12px',
-//   backgroundColor: disabled ? '#e2e8f0' : '#3b82f6',
-//   color: disabled ? '#94a3b8' : '#fff',
-//   border: 'none', borderRadius: '4px',
-//   cursor: disabled ? 'not-allowed' : 'pointer', fontSize: '13px'
-// });
+
+// export default SuperAdminDashboard;
 
 // export default SuperAdminDashboard;
 import React, { useState, useEffect, useMemo } from 'react';
@@ -1034,6 +819,7 @@ const ProductInventoryReport = () => {
 
       setRequests(requestsData);
 
+      // Map: productId -> request
       const requestMap = new Map();
       requestsData.forEach(req => {
         if (req.product && req.product.productId) {
@@ -1052,9 +838,15 @@ const ProductInventoryReport = () => {
 
         return {
           ...prod,
-          quantity: req?.quantity ?? '-',
-          adminNote: req?.adminNote ?? '-',
+          // ✅ product table values (kept separate)
+          productQuantity: prod.productQuantity ?? '0',
+          receiptVoucherNo: prod.receiptVoucherNo ?? '-',
+          supplierName: prod.supplierName ?? '-',
+          balance: prod.balance ?? '-',
+          // ✅ request values
+          requestQuantity: req?.quantity ?? '-',
           description: req?.description ?? '-',
+          adminNote: req?.adminNote ?? '-',
           status: requestStatus,
           departmentName: req?.departmentName ?? (prod.department?.departmentName ?? '-'),
           productDescription: prod.productDescription ?? '-',
@@ -1108,7 +900,7 @@ const ProductInventoryReport = () => {
   const inStockCount = periodProducts.filter(p => p.stockStatus === 'In Stock').length;
   const outStockCount = periodProducts.filter(p => p.stockStatus === 'Out of Stock').length;
 
-  // Build department usage (for PDF only — not shown on screen)
+  // Department usage (PDF only)
   useEffect(() => {
     const deptDetails = {};
     requests.forEach(req => {
@@ -1139,8 +931,8 @@ const ProductInventoryReport = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
-    const marginLeft = 40;
-    const marginRight = 40;
+    const marginLeft = 25;
+    const marginRight = 25;
     const tableWidth = pageWidth - marginLeft - marginRight;
 
     doc.setFontSize(16);
@@ -1164,6 +956,7 @@ const ProductInventoryReport = () => {
 
     let y = 84;
 
+    // Summary cards
     const cardY = y + 4;
     const cardHeight = 34;
     const cardGap = 10;
@@ -1201,7 +994,7 @@ const ProductInventoryReport = () => {
 
     y = cardY + cardHeight + 20;
 
-    // Department-wise Usage (PDF only)
+    // ===== Department-wise Usage =====
     const deptKeys = Object.keys(departmentUsage);
     if (deptKeys.length > 0) {
       doc.setFontSize(12);
@@ -1268,7 +1061,7 @@ const ProductInventoryReport = () => {
       y = doc.lastAutoTable.finalY + 24;
     }
 
-    // Product Details (PDF only)
+    // ===== Product Details — ✅ FULL COLUMN SET =====
     doc.setFontSize(12);
     doc.setTextColor(30, 64, 175);
     doc.setFont('helvetica', 'bold');
@@ -1281,16 +1074,32 @@ const ProductInventoryReport = () => {
       tableWidth: tableWidth,
       theme: 'grid',
       head: [[
-        'Product Name', 'Description', 'Qty', 'Department', 'Price',
-        'Receipt Date', 'Issue Date', 'Staff Description', 'Admin Note',
-        'Admin Status', 'Stock Status'
+        'Product Name',
+        'Description',
+        'Product Qty',
+        'Req Qty',
+        'Department',
+        'Supplier',
+        'Voucher No',
+        'Price',
+        'Balance',
+        'Receipt Date',
+        'Issue Date',
+        'Staff Desc',
+        'Admin Note',
+        'Status',
+        'Stock Status'
       ]],
       body: periodProducts.map(p => [
         p.productName ?? '-',
         p.productDescription ?? '-',
-        { content: p.quantity ?? '-', styles: { halign: 'center' } },
+        { content: p.productQuantity ?? '0', styles: { halign: 'center', fontStyle: 'bold' } },
+        { content: p.requestQuantity ?? '-', styles: { halign: 'center' } },
         p.departmentName ?? '-',
+        p.supplierName ?? '-',
+        p.receiptVoucherNo ?? '-',
         { content: p.price != null ? Number(p.price).toLocaleString() : '-', styles: { halign: 'right' } },
+        { content: p.balance != null && p.balance !== '-' ? Number(p.balance).toLocaleString() : '-', styles: { halign: 'right' } },
         { content: p.receiptDate ?? '-', styles: { halign: 'center' } },
         { content: p.issueDate ?? '-', styles: { halign: 'center' } },
         p.description ?? '-',
@@ -1298,35 +1107,77 @@ const ProductInventoryReport = () => {
         p.status ?? '-',
         p.stockStatus ?? '-'
       ]),
-      styles: { fontSize: 8, cellPadding: { top: 5, right: 6, bottom: 5, left: 6 }, overflow: 'linebreak', valign: 'middle', lineColor: [226, 232, 240], lineWidth: 0.5, textColor: [30, 41, 59] },
-      headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold', halign: 'center', valign: 'middle', fontSize: 8 },
+      styles: {
+        fontSize: 7,
+        cellPadding: { top: 5, right: 4, bottom: 5, left: 4 },
+        overflow: 'linebreak',
+        valign: 'middle',
+        lineColor: [226, 232, 240],
+        lineWidth: 0.5,
+        textColor: [30, 41, 59]
+      },
+      headStyles: {
+        fillColor: [30, 64, 175],
+        textColor: 255,
+        fontStyle: 'bold',
+        halign: 'center',
+        valign: 'middle',
+        fontSize: 7
+      },
       alternateRowStyles: { fillColor: [248, 250, 252] },
       columnStyles: {
-        0: { cellWidth: 75, halign: 'left', fontStyle: 'bold' },
-        1: { cellWidth: 105, halign: 'left' },
-        2: { cellWidth: 35, halign: 'center' },
-        3: { cellWidth: 75, halign: 'left' },
-        4: { cellWidth: 50, halign: 'right' },
-        5: { cellWidth: 65, halign: 'center' },
-        6: { cellWidth: 65, halign: 'center' },
-        7: { cellWidth: 95, halign: 'left' },
-        8: { cellWidth: 95, halign: 'left' },
-        9: { cellWidth: 70, halign: 'center' },
-        10: { cellWidth: 60, halign: 'center' }
+        0:  { cellWidth: 58, halign: 'left', fontStyle: 'bold' }, // Product Name
+        1:  { cellWidth: 70, halign: 'left' },                     // Description
+        2:  { cellWidth: 50, halign: 'center' },                   // Product Qty
+        3:  { cellWidth: 40, halign: 'center' },                   // Req Qty
+        4:  { cellWidth: 55, halign: 'left' },                     // Department
+        5:  { cellWidth: 55, halign: 'left' },                     // Supplier
+        6:  { cellWidth: 55, halign: 'left' },                     // Voucher No
+        7:  { cellWidth: 38, halign: 'right' },                    // Price
+        8:  { cellWidth: 38, halign: 'right' },                    // Balance
+        9:  { cellWidth: 55, halign: 'center' },                   // Receipt Date
+        10: { cellWidth: 48, halign: 'center' },                   // Issue Date
+        11: { cellWidth: 65, halign: 'left' },                     // Staff Desc
+        12: { cellWidth: 65, halign: 'left' },                     // Admin Note
+        13: { cellWidth: 48, halign: 'center' },                   // Status
+        14: { cellWidth: 50, halign: 'center' }                    // Stock Status
       },
       margin: { left: marginLeft, right: marginRight },
       didParseCell: (data) => {
         if (data.section === 'body') {
-          if (data.column.index === 9) {
+          if (data.column.index === 13) {
             const v = data.cell.raw;
-            if (v === 'APPROVED') { data.cell.styles.textColor = [22, 101, 52]; data.cell.styles.fillColor = [240, 253, 244]; data.cell.styles.fontStyle = 'bold'; }
-            else if (v === 'REJECTED') { data.cell.styles.textColor = [185, 28, 28]; data.cell.styles.fillColor = [254, 242, 242]; data.cell.styles.fontStyle = 'bold'; }
-            else if (v === 'PENDING') { data.cell.styles.textColor = [146, 64, 14]; data.cell.styles.fillColor = [255, 251, 235]; data.cell.styles.fontStyle = 'bold'; }
+            if (v === 'APPROVED') {
+              data.cell.styles.textColor = [22, 101, 52];
+              data.cell.styles.fillColor = [240, 253, 244];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (v === 'REJECTED') {
+              data.cell.styles.textColor = [185, 28, 28];
+              data.cell.styles.fillColor = [254, 242, 242];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (v === 'PENDING') {
+              data.cell.styles.textColor = [146, 64, 14];
+              data.cell.styles.fillColor = [255, 251, 235];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (v === 'CHECKED') {
+              data.cell.styles.textColor = [109, 40, 217];
+              data.cell.styles.fillColor = [237, 233, 254];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (v === 'COMPLETED') {
+              data.cell.styles.textColor = [30, 64, 175];
+              data.cell.styles.fillColor = [219, 234, 254];
+              data.cell.styles.fontStyle = 'bold';
+            }
           }
-          if (data.column.index === 10) {
+          if (data.column.index === 14) {
             const v = data.cell.raw;
-            if (v === 'In Stock') { data.cell.styles.textColor = [22, 101, 52]; data.cell.styles.fontStyle = 'bold'; }
-            else if (v === 'Out of Stock') { data.cell.styles.textColor = [185, 28, 28]; data.cell.styles.fontStyle = 'bold'; }
+            if (v === 'In Stock') {
+              data.cell.styles.textColor = [22, 101, 52];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (v === 'Out of Stock') {
+              data.cell.styles.textColor = [185, 28, 28];
+              data.cell.styles.fontStyle = 'bold';
+            }
           }
         }
       }
@@ -1415,8 +1266,7 @@ const ProductInventoryReport = () => {
         </div>
       )}
 
-      {/* ❌ No department usage table and no product table on screen for Super Admin.
-          Both tables are included in the exported PDF. */}
+      {/* No tables on screen — they live in the exported PDF */}
     </div>
   );
 };
@@ -1624,7 +1474,6 @@ const SuperAdminDashboard = () => {
         Welcome, Super Admin — Full System Control
       </p>
 
-      {/* Dashboard Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
         {cards.map((card) => (
           <div
@@ -1657,7 +1506,6 @@ const SuperAdminDashboard = () => {
         ))}
       </div>
 
-      {/* ============ EMBEDDED INVENTORY REPORT (SUMMARY + PDF ONLY) ============ */}
       {showInventoryReport && (
         <div style={{ marginTop: '40px', paddingTop: '30px', borderTop: '2px solid #e2e8f0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -1673,7 +1521,6 @@ const SuperAdminDashboard = () => {
         </div>
       )}
 
-      {/* ============ REPORT OPTIONS MODAL ============ */}
       {showReportOptions && (
         <div style={modalOverlay} onClick={() => !downloadingType && setShowReportOptions(false)}>
           <div style={modalContent} onClick={(e) => e.stopPropagation()}>
@@ -1732,7 +1579,6 @@ const SuperAdminDashboard = () => {
   );
 };
 
-// Shared styles
 const selectStyle = { padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', backgroundColor: '#fff', cursor: 'pointer' };
 
 export default SuperAdminDashboard;

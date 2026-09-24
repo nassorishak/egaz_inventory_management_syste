@@ -29,7 +29,10 @@ const ViewProduct = () => {
     issueDate: '',
     price: '',
     supplierName: '',
-    productDescription: ''
+    productDescription: '',
+    // ✅ NEW FIELDS
+    receiptVoucherNo: '',
+    balance: ''
   });
 
   // ==============================
@@ -79,10 +82,10 @@ const ViewProduct = () => {
   };
 
   // ==============================
-  // ADD DEPARTMENT  ← NEW
+  // ADD DEPARTMENT
   // ==============================
   const handleAddDepartment = () => {
-    navigate('/add-department');   // ⚠️ adjust to your real route
+    navigate('/add-department');
   };
 
   // ==============================
@@ -109,7 +112,10 @@ const ViewProduct = () => {
       issueDate: product.issueDate ?? '',
       price: product.price ?? '',
       supplierName: product.supplierName ?? '',
-      productDescription: product.productDescription ?? ''
+      productDescription: product.productDescription ?? '',
+      // ✅ NEW FIELDS
+      receiptVoucherNo: product.receiptVoucherNo ?? '',
+      balance: product.balance ?? ''
     });
 
     setShowForm(true);
@@ -180,7 +186,10 @@ const ViewProduct = () => {
         receiptDate: formData.receiptDate,
         issueDate: formData.issueDate,
         price: parseInt(formData.price, 10),
-        supplierName: formData.supplierName.trim()
+        supplierName: formData.supplierName.trim(),
+        // ✅ NEW FIELDS
+        receiptVoucherNo: formData.receiptVoucherNo.trim(),
+        balance: formData.balance === '' ? null : parseInt(formData.balance, 10)
       };
 
       console.log('Updating product:', productPayload);
@@ -270,7 +279,10 @@ const ViewProduct = () => {
       issueDate: '',
       price: '',
       supplierName: '',
-      productDescription: ''
+      productDescription: '',
+      // ✅ NEW FIELDS
+      receiptVoucherNo: '',
+      balance: ''
     });
   };
 
@@ -295,7 +307,6 @@ const ViewProduct = () => {
           </p>
         </div>
 
-        {/* ✅ Buttons: Add Department (left) + Add Product (right) */}
         <div style={styles.headerButtons}>
           <button
             type="button"
@@ -332,7 +343,9 @@ const ViewProduct = () => {
                 <th style={styles.th}>Product Description</th>
                 <th style={styles.th}>Price</th>
                 <th style={styles.th}>Receipt Date</th>
+                <th style={styles.th}>Receipt Voucher No</th>
                 <th style={styles.th}>Issue Date</th>
+                <th style={styles.th}>Balance</th>
                 <th style={styles.th}>Supplier</th>
                 <th style={styles.th}>Actions</th>
               </tr>
@@ -341,7 +354,7 @@ const ViewProduct = () => {
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan="9" style={styles.noProducts}>
+                  <td colSpan="11" style={styles.noProducts}>
                     No products found.
                   </td>
                 </tr>
@@ -379,7 +392,25 @@ const ViewProduct = () => {
 
                     <td style={styles.td}>{product.receiptDate || '-'}</td>
 
+                    {/* ✅ Receipt Voucher No */}
+                    <td style={styles.td}>
+                      {product.receiptVoucherNo || '-'}
+                    </td>
+
                     <td style={styles.td}>{product.issueDate || '-'}</td>
+
+                    {/* ✅ Balance */}
+                    <td style={styles.td}>
+                      <span
+                        style={
+                          Number(product.balance) > 0
+                            ? styles.stockAvailable
+                            : styles.stockEmpty
+                        }
+                      >
+                        {product.balance ?? '0'}
+                      </span>
+                    </td>
 
                     <td style={styles.td}>{product.supplierName || '-'}</td>
 
@@ -392,16 +423,6 @@ const ViewProduct = () => {
                         >
                           Update
                         </button>
-{/* 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleDeleteProduct(product.productId)
-                          }
-                          style={styles.deleteButton}
-                        >
-                          Delete
-                        </button> */}
                       </div>
                     </td>
 
@@ -514,6 +535,19 @@ const ViewProduct = () => {
                 />
               </div>
 
+              {/* ✅ RECEIPT VOUCHER NO */}
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Receipt Voucher No</label>
+                <input
+                  id="receiptVoucherNo"
+                  type="text"
+                  value={formData.receiptVoucherNo}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  placeholder="e.g. RV-2024-001"
+                />
+              </div>
+
               {/* ISSUE DATE */}
               <div style={styles.inputGroup}>
                 <label style={styles.label}>Issue Date</label>
@@ -524,6 +558,20 @@ const ViewProduct = () => {
                   onChange={handleInputChange}
                   style={styles.input}
                   required
+                />
+              </div>
+
+              {/* ✅ BALANCE */}
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Balance</label>
+                <input
+                  id="balance"
+                  type="number"
+                  min="0"
+                  value={formData.balance}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  placeholder="0"
                 />
               </div>
 
@@ -597,17 +645,15 @@ const styles = {
   title: { margin: 0, color: '#1e293b', fontSize: '28px' },
   subtitle: { marginTop: '6px', color: '#64748b', fontSize: '14px' },
 
-  // ✅ NEW: container for the two header buttons
   headerButtons: {
     display: 'flex',
     gap: '12px',
     flexWrap: 'wrap'
   },
 
-  // ✅ NEW: Add Department button (green, distinct from Add Product)
   departmentButton: {
     border: 'none',
-    backgroundColor: '#10b981',      // emerald green
+    backgroundColor: '#10b981',
     color: 'white',
     padding: '12px 22px',
     borderRadius: '8px',
@@ -649,7 +695,7 @@ const styles = {
     overflowX: 'auto',
     boxShadow: '0 4px 15px rgba(0,0,0,0.06)'
   },
-  table: { width: '100%', borderCollapse: 'collapse', minWidth: '1000px' },
+  table: { width: '100%', borderCollapse: 'collapse', minWidth: '1100px' },
   th: {
     backgroundColor: '#1e40af',
     color: 'white',

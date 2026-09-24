@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
 
@@ -96,31 +95,32 @@
 //           body, html {
 //             height: 100%;
 //             width: 100%;
-//             background-color: #f3f4f6;
 //             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 //           }
 
+//           /* RICH GRADIENT BACKGROUND */
 //           .product-page {
-//             min-height: 100vh;
+//             min-height: 50vh;
 //             width: 100%;
 //             display: flex;
 //             justify-content: center;
 //             align-items: center;
 //             padding: 16px;
-//             background: #f3f4f6;
+//             background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f3f4f6 100%);
 //           }
 
-//           /* COMPACT CARD */
+//           /* CARD WITH TOP ACCENT */
 //           .product-card {
 //             background: #ffffff;
-//             border-radius: 12px;
+//             border-radius: 14px;
 //             width: 100%;
-//             max-width: 1100px;
-//             max-height: 88vh;
+//             max-width: 1000px;
+//             max-height: 85vh;
 //             overflow-y: auto;
 //             padding: 24px 28px;
-//             box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
-//             border: 1px solid #e5e7eb;
+//             box-shadow: 0 20px 40px -10px rgba(124, 58, 237, 0.15), 0 8px 16px -8px rgba(0, 0, 0, 0.05);
+//             border: 1px solid #ede9fe;
+//             border-top: 4px solid #7c3aed;
 //             scrollbar-width: thin;
 //             scrollbar-color: #c4b5fd #f3f4f6;
 //           }
@@ -130,11 +130,28 @@
 //           .product-card::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 8px; }
 //           .product-card::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
 
-//           /* HEADER - Smaller */
+//           /* HEADER */
 //           .card-header {
 //             margin-bottom: 18px;
 //             padding-bottom: 14px;
-//             border-bottom: 1px solid #e5e7eb;
+//             border-bottom: 1px solid #f3f4f6;
+//             display: flex;
+//             align-items: center;
+//             gap: 12px;
+//           }
+
+//           .header-icon {
+//             width: 40px;
+//             height: 40px;
+//             border-radius: 10px;
+//             background: linear-gradient(135deg, #7c3aed, #a78bfa);
+//             display: flex;
+//             align-items: center;
+//             justify-content: center;
+//             font-size: 20px;
+//             color: #ffffff;
+//             flex-shrink: 0;
+//             box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
 //           }
 
 //           .card-header h2 {
@@ -142,15 +159,16 @@
 //             color: #111827;
 //             font-size: 18px;
 //             font-weight: 700;
+//             letter-spacing: -0.3px;
 //           }
 
 //           .card-header p {
-//             margin: 4px 0 0;
+//             margin: 3px 0 0;
 //             color: #6b7280;
 //             font-size: 12px;
 //           }
 
-//           /* 3-COLUMN GRID - Tighter */
+//           /* 3-COLUMN GRID */
 //           .form-grid {
 //             display: grid;
 //             grid-template-columns: 1fr 1fr 1fr;
@@ -160,24 +178,35 @@
 //           .form-group { display: flex; flex-direction: column; }
 //           .full-width { grid-column: 1 / -1; }
 
-//           /* SECTION TITLE - Compact */
+//           /* SECTION TITLE WITH PILL BACKGROUND */
 //           .section-title {
 //             grid-column: 1 / -1;
 //             display: flex;
 //             align-items: center;
-//             gap: 10px;
+//             gap: 8px;
 //             margin-top: 4px;
 //             margin-bottom: 0;
-//             color: #7c3aed;
+//             color: #6d28d9;
 //             font-size: 11px;
 //             font-weight: 700;
 //             text-transform: uppercase;
-//             letter-spacing: 0.5px;
+//             letter-spacing: 0.6px;
 //           }
 
-//           .section-line { flex: 1; height: 1px; background: #e5e7eb; }
+//           .section-title span.emoji {
+//             display: inline-flex;
+//             align-items: center;
+//             justify-content: center;
+//             width: 22px;
+//             height: 22px;
+//             background: #ede9fe;
+//             border-radius: 6px;
+//             font-size: 12px;
+//           }
 
-//           /* LABEL - Smaller */
+//           .section-line { flex: 1; height: 1px; background: #ede9fe; }
+
+//           /* LABEL */
 //           .form-group label {
 //             margin-bottom: 4px;
 //             color: #374151;
@@ -187,14 +216,14 @@
 
 //           .required { color: #ef4444; margin-left: 2px; }
 
-//           /* INPUTS - Shorter */
+//           /* INPUTS */
 //           .product-input, .department-select {
 //             width: 100%;
 //             height: 38px;
 //             padding: 0 10px;
-//             border: 1px solid #d1d5db;
+//             border: 1px solid #e5e7eb;
 //             border-radius: 6px;
-//             background: #ffffff;
+//             background: #fafafa;
 //             color: #1f2937;
 //             font-size: 13px;
 //             outline: none;
@@ -203,16 +232,23 @@
 //           }
 
 //           .product-input::placeholder { color: #9ca3af; }
-//           .product-input:hover, .department-select:hover { border-color: #9ca3af; }
+
+//           .product-input:hover, .department-select:hover {
+//             border-color: #c4b5fd;
+//             background: #ffffff;
+//           }
+
 //           .product-input:focus, .department-select:focus {
 //             border-color: #7c3aed;
-//             box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+//             background: #ffffff;
+//             box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 //           }
+
 //           .product-input:disabled, .department-select:disabled {
 //             background: #f9fafb; color: #9ca3af; cursor: not-allowed;
 //           }
 
-//           /* TEXTAREA - Compact */
+//           /* TEXTAREA */
 //           textarea.product-input {
 //             height: auto;
 //             padding: 8px 10px;
@@ -220,45 +256,51 @@
 //             min-height: 60px;
 //           }
 
-//           /* BUTTON - Shorter */
+//           /* BUTTON */
 //           .button-container {
 //             margin-top: 18px;
+//             display: flex;
+//             justify-content: center;
 //           }
 
 //           .add-button {
-//             width: 20%;
+//             width: 220px;
 //             height: 44px;
 //             padding: 0 20px;
-//             margin-left:390px;
 //             border: none;
-//             border-radius: 6px;
-//             background: #7c3aed;
+//             border-radius: 8px;
+//             background: linear-gradient(135deg, #7c3aed, #6d28d9);
 //             color: #ffffff;
 //             font-size: 14px;
 //             font-weight: 600;
 //             cursor: pointer;
-//             transition: all 0.2s ease;
+//             transition: all 0.25s ease;
 //             display: flex;
 //             align-items: center;
 //             justify-content: center;
 //             gap: 6px;
+//             box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
 //           }
 
 //           .add-button:hover {
-//             background: #6d28d9;
-//             transform: translateY(-1px);
-//             box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
-//           }
-//           .add-button:active { transform: translateY(0); }
-//           .add-button:disabled {
-//             background: #c4b5fd; cursor: not-allowed; transform: none; box-shadow: none;
+//             transform: translateY(-2px);
+//             box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
 //           }
 
-//           /* MESSAGES - Compact */
+//           .add-button:active { transform: translateY(0); }
+
+//           .add-button:disabled {
+//             background: #c4b5fd;
+//             cursor: not-allowed;
+//             transform: none;
+//             box-shadow: none;
+//           }
+
+//           /* MESSAGES */
 //           .message {
 //             margin-top: 14px;
 //             padding: 10px 12px;
-//             border-radius: 6px;
+//             border-radius: 8px;
 //             font-size: 13px;
 //             font-weight: 500;
 //             display: flex;
@@ -266,8 +308,17 @@
 //             gap: 6px;
 //           }
 
-//           .success-message { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-//           .error-message { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+//           .success-message {
+//             background: #f0fdf4;
+//             color: #15803d;
+//             border: 1px solid #bbf7d0;
+//           }
+
+//           .error-message {
+//             background: #fef2f2;
+//             color: #dc2626;
+//             border: 1px solid #fecaca;
+//           }
 
 //           /* RESPONSIVE */
 //           @media (max-width: 1024px) {
@@ -285,8 +336,9 @@
 //             .product-page { padding: 10px; }
 //             .product-card { padding: 16px 12px; border-radius: 10px; }
 //             .card-header h2 { font-size: 16px; }
+//             .header-icon { width: 34px; height: 34px; font-size: 16px; }
 //             .product-input, .department-select { height: 36px; font-size: 12px; }
-//             .add-button { height: 42px; font-size: 13px; }
+//             .add-button { width: 100%; height: 42px; font-size: 13px; }
 //           }
 //         `}
 //       </style>
@@ -295,15 +347,18 @@
 //         <div className="product-card">
           
 //           <div className="card-header">
-//             <h2>Add New Product</h2>
-//             <p>Fill in the details below to add a product to the inventory.</p>
+//             <div className="header-icon">📦</div>
+//             <div>
+//               <h2>Add New Product</h2>
+//               <p>Fill in the details below to add a product to the inventory.</p>
+//             </div>
 //           </div>
 
 //           <form onSubmit={handleSubmit}>
 //             <div className="form-grid">
 
 //               <div className="section-title">
-//                 📦 Product Information
+//                 <span className="emoji">📦</span> Product Information
 //                 <div className="section-line"></div>
 //               </div>
 
@@ -339,7 +394,7 @@
 //               </div>
 
 //               <div className="section-title">
-//                 📅 Product Dates
+//                 <span className="emoji">📅</span> Product Dates
 //                 <div className="section-line"></div>
 //               </div>
 
@@ -361,7 +416,7 @@
 //               <div className="form-group" style={{ visibility: 'hidden' }}></div>
 
 //               <div className="section-title">
-//                 🚚 Supplier & Department
+//                 <span className="emoji">🚚</span> Supplier & Department
 //                 <div className="section-line"></div>
 //               </div>
 
@@ -409,6 +464,7 @@
 // };
 
 // export default AddProduct;
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -420,6 +476,9 @@ const AddProduct = () => {
   const [price, setPrice] = useState('');
   const [supplierName, setSupplierName] = useState('');
   const [productDescription, setProductDescription] = useState('');
+  // ✅ NEW FIELDS
+  const [receiptVoucherNo, setReceiptVoucherNo] = useState('');
+  const [balance, setBalance] = useState('');
 
   const [departmentId, setDepartmentId] = useState('');
   const [departments, setDepartments] = useState([]);
@@ -472,7 +531,10 @@ const AddProduct = () => {
       price: parseInt(price, 10),
       supplierName: supplierName.trim(),
       productDescription: productDescription.trim(),
-      departmentId: parseInt(departmentId, 10)
+      departmentId: parseInt(departmentId, 10),
+      // ✅ NEW FIELDS
+      receiptVoucherNo: receiptVoucherNo.trim(),
+      balance: balance === '' ? null : parseInt(balance, 10)
     };
 
     try {
@@ -486,6 +548,8 @@ const AddProduct = () => {
       setProductName(''); setProductQuantity(''); setReceiptDate('');
       setIssueDate(''); setPrice(''); setSupplierName('');
       setDepartmentId(''); setProductDescription('');
+      // ✅ CLEAR NEW FIELDS
+      setReceiptVoucherNo(''); setBalance('');
     } catch (error) {
       console.error('Error adding product:', error.response?.data || error.message);
       const backendError = error.response?.data;
@@ -794,8 +858,12 @@ const AddProduct = () => {
                   value={price} onChange={(e) => setPrice(e.target.value)} required disabled={loading} />
               </div>
 
-              {/* Empty Col 3 */}
-              <div className="form-group" style={{ visibility: 'hidden' }}></div>
+              {/* ✅ BALANCE - Col 3 */}
+              <div className="form-group">
+                <label htmlFor="balance">Balance</label>
+                <input id="balance" type="number" min="0" className="product-input" placeholder="0"
+                  value={balance} onChange={(e) => setBalance(e.target.value)} disabled={loading} />
+              </div>
 
               {/* DESCRIPTION - Full Width */}
               <div className="form-group full-width">
@@ -816,15 +884,19 @@ const AddProduct = () => {
                   value={receiptDate} onChange={(e) => setReceiptDate(e.target.value)} required disabled={loading} />
               </div>
 
-              {/* ISSUE DATE - Col 2 */}
+              {/* ✅ RECEIPT VOUCHER NO - Col 2 */}
+              <div className="form-group">
+                <label htmlFor="receiptVoucherNo">Receipt Voucher No</label>
+                <input id="receiptVoucherNo" type="text" className="product-input" placeholder="e.g. RV-2024-001"
+                  value={receiptVoucherNo} onChange={(e) => setReceiptVoucherNo(e.target.value)} disabled={loading} />
+              </div>
+
+              {/* ISSUE DATE - Col 3 */}
               <div className="form-group">
                 <label htmlFor="issueDate">Issue Date <span className="required">*</span></label>
                 <input id="issueDate" type="date" className="product-input"
                   value={issueDate} onChange={(e) => setIssueDate(e.target.value)} required disabled={loading} />
               </div>
-
-              {/* Empty Col 3 */}
-              <div className="form-group" style={{ visibility: 'hidden' }}></div>
 
               <div className="section-title">
                 <span className="emoji">🚚</span> Supplier & Department
