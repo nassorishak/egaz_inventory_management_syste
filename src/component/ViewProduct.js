@@ -631,7 +631,7 @@ const styles = {
   page: {
     padding: '30px',
     backgroundColor: '#f8fafc',
-    minHeight: '100vh',
+    minHeight: '80vh',
     fontFamily: 'Arial, Helvetica, sans-serif'
   },
   header: {

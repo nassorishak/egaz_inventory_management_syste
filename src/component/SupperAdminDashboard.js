@@ -4908,13 +4908,13 @@ const SuperAdminDashboard = () => {
   };
 
   const cards = [
-    {
-      title: 'All Products Report',
-      icon: '📦',
-      description: 'Download a full report of all registered products.',
-      color: '#3b82f6',
-      actions: [{ label: 'Download Product Report', type: 'report', kind: 'products' }],
-    },
+    // {
+    //   title: 'All Products Report',
+    //   icon: '📦',
+    //   description: 'Download a full report of all registered products.',
+    //   color: '#3b82f6',
+    //   actions: [{ label: 'Download Product Report', type: 'report', kind: 'products' }],
+    // },
     {
       title: 'System Users',
       icon: '👥',

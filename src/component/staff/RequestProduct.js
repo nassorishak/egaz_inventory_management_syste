@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
 
@@ -18,23 +17,64 @@
 
 //   const userId = localStorage.getItem('userId');
 
+//   // ============================================================
+//   // LOAD PRODUCTS + DEPARTMENTS
+//   // ============================================================
 //   useEffect(() => {
+//     let cancelled = false;
+
 //     const load = async () => {
+//       setError('');
 //       try {
 //         const [pRes, dRes] = await Promise.all([
 //           axios.get('http://localhost:8080/api/products/all'),
 //           axios.get('http://localhost:8080/api/departments'),
 //         ]);
-//         setProducts(Array.isArray(pRes.data) ? pRes.data : []);
-//         setDepartments(Array.isArray(dRes.data) ? dRes.data : []);
+
+//         if (cancelled) return;
+
+//         console.log('📦 Products raw:', pRes.data);
+//         console.log('🏢 Departments raw:', dRes.data);
+
+//         // Handle both `[...]` and `{ data: [...] }` shapes
+//         const productsData = Array.isArray(pRes.data)
+//           ? pRes.data
+//           : Array.isArray(pRes.data?.data)
+//             ? pRes.data.data
+//             : [];
+
+//         const departmentsData = Array.isArray(dRes.data)
+//           ? dRes.data
+//           : Array.isArray(dRes.data?.data)
+//             ? dRes.data.data
+//             : [];
+
+//         console.log('📦 Products count:', productsData.length);
+//         console.log('🏢 Departments count:', departmentsData.length);
+
+//         setProducts(productsData);
+//         setDepartments(departmentsData);
 //       } catch (err) {
-//         console.error(err);
-//         setError('Failed to load data. Make sure the backend is running.');
+//         if (cancelled) return;
+//         console.error('❌ Load error:', err);
+//         console.error('   Response:', err.response?.data);
+//         console.error('   Status:', err.response?.status);
+
+//         setError(
+//           err.response?.data?.message ||
+//           err.response?.data ||
+//           'Failed to load products/departments. Is the backend running?'
+//         );
 //       }
 //     };
+
 //     load();
+//     return () => { cancelled = true; };
 //   }, []);
 
+//   // ============================================================
+//   // SUBMIT REQUEST
+//   // ============================================================
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setError('');
@@ -90,7 +130,6 @@
 //           font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 //         }
 
-//         /* RICH GRADIENT BACKGROUND */
 //         .request-page {
 //           min-height: 80vh;
 //           width: 100%;
@@ -101,7 +140,6 @@
 //           background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f3f4f6 100%);
 //         }
 
-//         /* CARD WITH TOP ACCENT */
 //         .request-card {
 //           background: #ffffff;
 //           border-radius: 14px;
@@ -122,7 +160,6 @@
 //         .request-card::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 8px; }
 //         .request-card::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
 
-//         /* HEADER */
 //         .card-header {
 //           margin-bottom: 18px;
 //           padding-bottom: 14px;
@@ -160,7 +197,6 @@
 //           font-size: 12px;
 //         }
 
-//         /* 2-COLUMN HORIZONTAL GRID */
 //         .form-grid {
 //           display: grid;
 //           grid-template-columns: 1fr 1fr;
@@ -170,7 +206,6 @@
 //         .form-group { display: flex; flex-direction: column; }
 //         .full-width { grid-column: 1 / -1; }
 
-//         /* SECTION TITLE WITH PILL BACKGROUND */
 //         .section-title {
 //           grid-column: 1 / -1;
 //           display: flex;
@@ -198,7 +233,6 @@
 
 //         .section-line { flex: 1; height: 1px; background: #ede9fe; }
 
-//         /* LABEL */
 //         .form-group label {
 //           margin-bottom: 4px;
 //           color: #374151;
@@ -208,7 +242,6 @@
 
 //         .required { color: #ef4444; margin-left: 2px; }
 
-//         /* INPUTS */
 //         .product-input, .product-select, .product-textarea {
 //           width: 100%;
 //           height: 38px;
@@ -247,7 +280,6 @@
 //           background: #f9fafb; color: #9ca3af; cursor: not-allowed;
 //         }
 
-//         /* WARNING */
 //         .warning-box {
 //           grid-column: 1 / -1;
 //           padding: 8px 12px;
@@ -258,7 +290,6 @@
 //           border: 1px solid #fde68a;
 //         }
 
-//         /* SUMMARY */
 //         .summary-box {
 //           grid-column: 1 / -1;
 //           background: #f8fafc;
@@ -282,7 +313,6 @@
 //           gap: 6px 16px;
 //         }
 
-//         /* BUTTON */
 //         .button-container {
 //           grid-column: 1 / -1;
 //           margin-top: 6px;
@@ -323,7 +353,6 @@
 //           box-shadow: none;
 //         }
 
-//         /* MESSAGES */
 //         .message {
 //           grid-column: 1 / -1;
 //           margin-top: 14px;
@@ -339,7 +368,6 @@
 //         .success-message { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
 //         .error-message { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-//         /* FOOTER */
 //         .form-footer {
 //           margin-top: 14px;
 //           text-align: center;
@@ -347,7 +375,6 @@
 //           font-size: 12px;
 //         }
 
-//         /* RESPONSIVE */
 //         @media (max-width: 768px) {
 //           .request-card { padding: 20px 16px; max-height: 95vh; }
 //           .form-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -399,12 +426,15 @@
 //                   disabled={loading}
 //                 >
 //                   <option value="">-- Select a product --</option>
-//                   {products.map((p) => (
-//                     <option key={p.productId} value={p.productId}>
-//                       {p.productName}
-//                       {/* {p.productName} (in store: {p.productQuantity}) */}
-//                     </option>
-//                   ))}
+//                   {products.length === 0 ? (
+//                     <option value="" disabled>No products available</option>
+//                   ) : (
+//                     products.map((p) => (
+//                       <option key={p.productId} value={p.productId}>
+//                         {p.productName}
+//                       </option>
+//                     ))
+//                   )}
 //                 </select>
 //               </div>
 
@@ -424,7 +454,7 @@
 //                 />
 //               </div>
 
-//               {/* DESCRIPTION - Full Width */}
+//               {/* DESCRIPTION */}
 //               <div className="form-group full-width">
 //                 <label htmlFor="description">Product Description <span className="required">*</span></label>
 //                 <textarea
@@ -457,11 +487,15 @@
 //                   disabled={loading}
 //                 >
 //                   <option value="">-- Select your department --</option>
-//                   {departments.map((d) => (
-//                     <option key={d.departmentId} value={d.departmentId}>
-//                       {d.departmentName}
-//                     </option>
-//                   ))}
+//                   {departments.length === 0 ? (
+//                     <option value="" disabled>No departments available</option>
+//                   ) : (
+//                     departments.map((d) => (
+//                       <option key={d.departmentId} value={d.departmentId}>
+//                         {d.departmentName}
+//                       </option>
+//                     ))
+//                   )}
 //                 </select>
 //               </div>
 
@@ -517,7 +551,7 @@
 //           </form>
 
 //           <div className="form-footer">
-//             Fields marked with <span style={{ color: '#ef4444' }}>*</span> are required.
+//             <span style={{ color: '#ef4444' }}></span>
 //           </div>
 
 //         </div>
@@ -527,11 +561,13 @@
 // };
 
 // export default RequestProduct;
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const RequestProduct = () => {
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [departments, setDepartments] = useState([]);
 
@@ -566,7 +602,6 @@ const RequestProduct = () => {
         console.log('📦 Products raw:', pRes.data);
         console.log('🏢 Departments raw:', dRes.data);
 
-        // Handle both `[...]` and `{ data: [...] }` shapes
         const productsData = Array.isArray(pRes.data)
           ? pRes.data
           : Array.isArray(pRes.data?.data)
@@ -579,17 +614,11 @@ const RequestProduct = () => {
             ? dRes.data.data
             : [];
 
-        console.log('📦 Products count:', productsData.length);
-        console.log('🏢 Departments count:', departmentsData.length);
-
         setProducts(productsData);
         setDepartments(departmentsData);
       } catch (err) {
         if (cancelled) return;
         console.error('❌ Load error:', err);
-        console.error('   Response:', err.response?.data);
-        console.error('   Status:', err.response?.status);
-
         setError(
           err.response?.data?.message ||
           err.response?.data ||
@@ -607,6 +636,11 @@ const RequestProduct = () => {
   // ============================================================
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🚀 Submit clicked');
+    console.log('👤 userId:', userId);
+    console.log('📦 productId:', productId);
+    console.log('🏢 departmentId:', departmentId);
+
     setError('');
     setSuccess('');
 
@@ -619,8 +653,9 @@ const RequestProduct = () => {
 
     try {
       setLoading(true);
+      console.log('📡 Sending POST request...');
 
-      await axios.post(
+      const res = await axios.post(
         `http://localhost:8080/api/product-requests/create?userId=${userId}&productId=${productId}&departmentId=${departmentId}`,
         {
           quantity: parseInt(quantity, 10),
@@ -630,15 +665,33 @@ const RequestProduct = () => {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
+      console.log('✅ Response:', res.status, res.data);
+
       setSuccess('Your request has been sent to the Admin successfully!');
       setProductId('');
       setDepartmentId('');
       setQuantity('');
       setIssueDate('');
       setDescription('');
+
+      // ✅ NAVIGATE to My Requests page after short delay
+      console.log('🧭 Navigating to /my-request ...');
+      setTimeout(() => {
+        console.log('🧭 navigate() called now');
+        navigate('/my-request');
+      }, 1200);
+
     } catch (err) {
+      console.error('❌ Submit error:', err);
+      console.error('   Response:', err.response?.data);
+      console.error('   Status:', err.response?.status);
+
       const msg = err.response?.data;
-      setError(typeof msg === 'string' ? msg : 'Failed to submit request.');
+      setError(
+        typeof msg === 'string'
+          ? msg
+          : msg?.message || 'Failed to submit request.'
+      );
     } finally {
       setLoading(false);
     }
@@ -1081,7 +1134,7 @@ const RequestProduct = () => {
           </form>
 
           <div className="form-footer">
-            Fields marked with <span style={{ color: '#ef4444' }}>*</span> are required.
+            <span style={{ color: '#ef4444' }}></span>
           </div>
 
         </div>

@@ -1402,13 +1402,13 @@ const AdminDashboard = () => {
 
   // ============ CARDS ============
   const cards = [
-    {
-      title: 'Products',
-      icon: '📦',
-      description: 'Download a report of all registered products.',
-      color: '#3b82f6',
-      actions: [{ label: 'Download Product Report', type: 'report', kind: 'products' }],
-    },
+    // {
+    //   title: 'Products',
+    //   icon: '📦',
+    //   description: 'Download a report of all registered products.',
+    //   color: '#3b82f6',
+    //   actions: [{ label: 'Download Product Report', type: 'report', kind: 'products' }],
+    // },
     {
       title: 'Users',
       icon: '👥',
